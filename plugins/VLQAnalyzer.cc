@@ -1,0 +1,197 @@
+// -*- C++ -*-
+//
+// Package:    Upgrades/VLQAnalyzer
+// Class:      VLQAnalyzer
+// 
+/**\class VLQAnalyzer VLQAnalyzer.cc Upgrades/VLQAnalyzer/plugins/VLQAnalyzer.cc
+
+ Description: [one line class summary]
+
+ Implementation:
+     [Notes on implementation]
+*/
+//
+// Original Author:  Sadia Khalil
+//         Created:  Mon, 15 Jan 2018 19:19:16 GMT
+//
+//
+
+
+// system include files
+#include <memory>
+
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
+
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackExtra.h"
+#include "DataFormats/MuonReco/interface/MuonCocktails.h"
+#include "Upgrades/VLQAnalyzer/interface/EventInfoTree.h"
+
+#include "TTree.h"
+#include "TFile.h"
+#include "TLorentzVector.h"
+//
+// class declaration
+//
+
+// If the analyzer does not use TFileService, please remove
+// the template argument to the base class so the class inherits
+// from  edm::one::EDAnalyzer<> and also remove the line from
+// constructor "usesResource("TFileService");"
+// This will improve performance in multithreaded jobs.
+
+class VLQAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+   public:
+      explicit VLQAnalyzer(const edm::ParameterSet&);
+      ~VLQAnalyzer();
+
+      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+
+
+   private:
+      virtual void beginJob() override;
+      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+      virtual void endJob() override;
+
+      // ----------member data ---------------------------
+      //unsigned int pileup_;
+      //edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puInfo_;
+      edm::InputTag puInfo_;
+      //edm::EDGetTokenT<reco::VertexCollection >   vtxToken_;
+      edm::EDGetTokenT<std::vector<reco::Vertex>> vtxToken_;
+      edm::Service<TFileService> fs_;
+      TTree* tree_;
+      
+      EventInfoTree evt_; 
+};
+
+//
+// constants, enums and typedefs
+//
+
+//
+// static data member definitions
+//
+
+//
+// constructors and destructor
+//
+VLQAnalyzer::VLQAnalyzer(const edm::ParameterSet& iConfig):
+   puInfo_         (iConfig.getParameter<edm::InputTag>("puInfo")),
+   //pileup_         (iConfig.getParameter<unsigned int>("pileup"))
+   //vtxToken_       (consumes<reco::VertexCollection> (iConfig.getParameter<edm::InputTag>("vertices"))),
+   vtxToken_       (consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vertices"))) 
+{
+   consumes<std::vector<PileupSummaryInfo>>(puInfo_);
+   //now do what ever initialization is needed
+   usesResource("TFileService");
+
+}
+
+
+VLQAnalyzer::~VLQAnalyzer()
+{
+ 
+   // do anything here that needs to be done at desctruction time
+   // (e.g. close files, deallocate resources etc.)
+
+}
+
+
+//
+// member functions
+//
+
+// ------------ method called for each event  ------------
+void
+VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+   using namespace edm;
+   evt_.runno = iEvent.eventAuxiliary().run();
+   evt_.lumisec = iEvent.eventAuxiliary().luminosityBlock();
+   evt_.evtno = iEvent.eventAuxiliary().event();
+   
+   edm::Handle<std::vector< PileupSummaryInfo > > puInfo;
+   iEvent.getByLabel(puInfo_, puInfo);
+   
+   std::vector<PileupSummaryInfo>::const_iterator pvi;
+   for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
+      //std::cout << " Pileup Information: bunchXing, nInt, TrueNInt " << pvi->getBunchCrossing() << " " << pvi->getPU_NumInteractions() << " "<< pvi->getTrueNumInteractions() <<std::endl;
+      evt_.npuTrue = pvi->getTrueNumInteractions(); 
+      evt_.npuInt = pvi->getBunchCrossing(); 
+      evt_.puBX = pvi->getPU_NumInteractions();
+   }
+   //std::cout << " next ... " << std::endl;
+   edm::Handle<reco::VertexCollection> vertices;
+   iEvent.getByToken(vtxToken_, vertices);
+   if (vertices->empty()) return;
+   evt_.npv = vertices->size();
+   evt_.nvtx = 0;
+   for (size_t i = 0; i < vertices->size(); i++) {
+      if (vertices->at(i).isFake()) continue;
+      if (vertices->at(i).ndof() <= 4) continue;   
+      evt_.vPt2.push_back(vertices->at(i).p4().pt());
+      evt_.nvtx++;
+   }
+   
+   tree_->Fill();
+   
+#ifdef THIS_IS_AN_EVENT_EXAMPLE
+   Handle<ExampleData> pIn;
+   iEvent.getByLabel("example",pIn);
+#endif
+   
+#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
+   ESHandle<SetupData> pSetup;
+   iSetup.get<SetupRecord>().get(pSetup);
+#endif
+}
+
+
+// ------------ method called once each job just before starting event loop  ------------
+void 
+VLQAnalyzer::beginJob()
+{
+  tree_ = fs_->make<TTree>("anatree", "anatree") ;
+  evt_.RegisterTree(tree_, "SelectedEvt") ;
+}
+
+// ------------ method called once each job just after ending the event loop  ------------
+void 
+VLQAnalyzer::endJob() 
+{
+}
+
+// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+void
+VLQAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+  //The following says we do not know what parameters are allowed so do no validation
+  // Please change this to state exactly what you do use, even if it is no parameters
+  edm::ParameterSetDescription desc;
+  desc.setUnknown();
+  descriptions.addDefault(desc);
+}
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(VLQAnalyzer);

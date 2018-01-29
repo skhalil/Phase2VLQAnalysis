@@ -1,0 +1,40 @@
+#include <string>
+#include <vector>
+#include <TTree.h>
+#include <TLorentzVector.h>
+
+class EventInfoTree {
+  public:
+
+    int    runno ;
+    int    lumisec ;
+    int    evtno;
+    int    bcno;
+    int    time;
+    double htHat;
+    double ptHat;
+    int    npv;   
+    int    npuTrue;
+    double ht ;   
+    std::vector<double> vPt2;
+    int    nvtx;
+
+    void clearTreeVectors() {
+         vPt2.clear();
+    }
+
+    void RegisterTree(TTree* tree, std::string name="SelectedEvents") {
+      tree->Branch((name+"_runno").c_str(), &runno, (name+"_runno/I").c_str());
+      tree->Branch((name+"_lumisec").c_str(), &lumisec, (name+"_lumisec/I").c_str());
+      tree->Branch((name+"_evtno").c_str(), &evtno, (name+"_evtno/I").c_str());
+      tree->Branch((name+"_bcno").c_str(), &bcno, (name+"_bcno/I").c_str());
+      tree->Branch((name+"_time").c_str(), &time, (name+"_time/I").c_str());
+      tree->Branch((name+"_htHat").c_str(), &htHat, (name+"_htHat/D").c_str()) ;
+      tree->Branch((name+"_ptHat").c_str(), &ptHat, (name+"_ptHat/D").c_str()) ;
+      tree->Branch((name+"_npv").c_str(), &npv, "npv/I");
+      tree->Branch((name+"_npuTrue").c_str(), &npuTrue, "npuTrue/I");
+      tree->Branch((name+"_ht").c_str(), &ht, "ht/D");
+      tree->Branch((name+"_vPt2").c_str(), &vPt2, (name+"_vPt2/D").c_str());
+      tree->Branch((name+"_nvtx").c_str(), &nvtx, (name+"_nvtx/D").c_str());
+    }
+};
