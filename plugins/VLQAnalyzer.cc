@@ -47,7 +47,7 @@
 #include "DataFormats/TrackReco/interface/TrackExtra.h"
 #include "DataFormats/MuonReco/interface/MuonCocktails.h"
 #include "Upgrades/VLQAnalyzer/interface/EventInfoTree.h"
-
+#include "Upgrades/VLQAnalyzer/interface/ElectronTree.h"
 #include "TTree.h"
 #include "TFile.h"
 #include "TLorentzVector.h"
@@ -62,28 +62,32 @@
 // This will improve performance in multithreaded jobs.
 
 class VLQAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
-   public:
-      explicit VLQAnalyzer(const edm::ParameterSet&);
-      ~VLQAnalyzer();
-
-      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-
-
-   private:
-      virtual void beginJob() override;
-      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
-      virtual void endJob() override;
-
-      // ----------member data ---------------------------
-      //unsigned int pileup_;
-      //edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puInfo_;
-      edm::InputTag puInfo_;
-      //edm::EDGetTokenT<reco::VertexCollection >   vtxToken_;
-      edm::EDGetTokenT<std::vector<reco::Vertex>> vtxToken_;
-      edm::Service<TFileService> fs_;
-      TTree* tree_;
-      
-      EventInfoTree evt_; 
+public:
+   explicit VLQAnalyzer(const edm::ParameterSet&);
+   ~VLQAnalyzer();
+   
+   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+   
+   
+private:
+   virtual void beginJob() override;
+   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+   virtual void endJob() override;
+   
+   // ----------member data ---------------------------
+   //unsigned int pileup_;
+   //edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puInfo_;
+   edm::InputTag puInfo_;
+   //edm::EDGetTokenT<reco::VertexCollection >   vtxToken_;
+   edm::EDGetTokenT<std::vector<reco::Vertex>> vtxToken_;
+   edm::EDGetTokenT<std::vector<pat::Electron>> elecsToken_;
+   edm::EDGetTokenT<reco::BeamSpot> bsToken_;
+   edm::EDGetTokenT<std::vector<reco::Conversion>> convToken_;
+   edm::Service<TFileService> fs_;
+   TTree* tree_;// *t_looseElecs_;
+   
+   EventInfoTree evt_; 
+   ElectronTree ele_;
 };
 
 //
@@ -101,18 +105,21 @@ VLQAnalyzer::VLQAnalyzer(const edm::ParameterSet& iConfig):
    puInfo_         (iConfig.getParameter<edm::InputTag>("puInfo")),
    //pileup_         (iConfig.getParameter<unsigned int>("pileup"))
    //vtxToken_       (consumes<reco::VertexCollection> (iConfig.getParameter<edm::InputTag>("vertices"))),
-   vtxToken_       (consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vertices"))) 
+   vtxToken_       (consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vertices"))),
+   elecsToken_(consumes<std::vector<pat::Electron>>(iConfig.getParameter<edm::InputTag>("electrons"))),
+   bsToken_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot"))),
+   convToken_(consumes<std::vector<reco::Conversion>>(iConfig.getParameter<edm::InputTag>("conversions"))) 
 {
    consumes<std::vector<PileupSummaryInfo>>(puInfo_);
    //now do what ever initialization is needed
    usesResource("TFileService");
-
+   
 }
 
 
 VLQAnalyzer::~VLQAnalyzer()
 {
- 
+   
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
 
@@ -128,13 +135,23 @@ void
 VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
-   evt_.runno = iEvent.eventAuxiliary().run();
-   evt_.lumisec = iEvent.eventAuxiliary().luminosityBlock();
-   evt_.evtno = iEvent.eventAuxiliary().event();
+   evt_.clearTreeVectors();  
    
    edm::Handle<std::vector< PileupSummaryInfo > > puInfo;
    iEvent.getByLabel(puInfo_, puInfo);
    
+   Handle<std::vector<pat::Electron>> elecs;
+   iEvent.getByToken(elecsToken_, elecs);
+   Handle<reco::ConversionCollection> conversions;
+   iEvent.getByToken(convToken_, conversions);
+   Handle<reco::BeamSpot> bsHandle;
+   iEvent.getByToken(bsToken_, bsHandle);
+   const reco::BeamSpot &beamspot = *bsHandle.product(); 
+   
+   evt_.runno = iEvent.eventAuxiliary().run();
+   evt_.lumisec = iEvent.eventAuxiliary().luminosityBlock();
+   evt_.evtno = iEvent.eventAuxiliary().event();
+
    std::vector<PileupSummaryInfo>::const_iterator pvi;
    for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
       //std::cout << " Pileup Information: bunchXing, nInt, TrueNInt " << pvi->getBunchCrossing() << " " << pvi->getPU_NumInteractions() << " "<< pvi->getTrueNumInteractions() <<std::endl;
@@ -147,16 +164,18 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(vtxToken_, vertices);
    if (vertices->empty()) return;
    evt_.npv = vertices->size();
-   evt_.nvtx = 0;
+   //evt_.nvtx = 0;
+   int nGoodVtx = 0;
    for (size_t i = 0; i < vertices->size(); i++) {
       if (vertices->at(i).isFake()) continue;
       if (vertices->at(i).ndof() <= 4) continue;   
       evt_.vPt2.push_back(vertices->at(i).p4().pt());
-      evt_.nvtx++;
+      nGoodVtx++;
    }
-   
+   evt_.nvtx = nGoodVtx;
+   //std::cout << "evt_.nvtx" <<evt_.nvtx << std::endl;
    tree_->Fill();
-   
+/*   
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
    Handle<ExampleData> pIn;
    iEvent.getByLabel("example",pIn);
@@ -166,6 +185,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    ESHandle<SetupData> pSetup;
    iSetup.get<SetupRecord>().get(pSetup);
 #endif
+*/
 }
 
 
@@ -175,6 +195,7 @@ VLQAnalyzer::beginJob()
 {
   tree_ = fs_->make<TTree>("anatree", "anatree") ;
   evt_.RegisterTree(tree_, "SelectedEvt") ;
+  
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
