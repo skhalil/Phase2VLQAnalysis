@@ -34,20 +34,28 @@
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
-#include "DataFormats/PatCandidates/interface/MET.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackExtra.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonCocktails.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
+
+#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
+
 #include "Upgrades/VLQAnalyzer/interface/EventInfoTree.h"
 #include "Upgrades/VLQAnalyzer/interface/ElectronTree.h"
+#include "Upgrades/VLQAnalyzer/interface/JetTree.h"
 #include "TTree.h"
 #include "TFile.h"
 #include "TLorentzVector.h"
@@ -79,15 +87,28 @@ private:
    //edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puInfo_;
    edm::InputTag puInfo_;
    //edm::EDGetTokenT<reco::VertexCollection >   vtxToken_;
-   edm::EDGetTokenT<std::vector<reco::Vertex>> vtxToken_;
-   edm::EDGetTokenT<std::vector<pat::Electron>> elecsToken_;
-   edm::EDGetTokenT<reco::BeamSpot> bsToken_;
+   edm::EDGetTokenT<std::vector<reco::Vertex>>     vtxToken_;
+   edm::EDGetTokenT<std::vector<pat::Electron>>    elecsToken_;
+   edm::EDGetTokenT<reco::BeamSpot>                bsToken_;
    edm::EDGetTokenT<std::vector<reco::Conversion>> convToken_;
+   
+   edm::EDGetTokenT<std::vector<pat::MET>> metsToken_;
+   PFJetIDSelectionFunctor                 jetIDLoose_;
+   PFJetIDSelectionFunctor                 jetIDTight_;
+   edm::EDGetTokenT<edm::View<pat::Jet> >  ak4jetsToken_;
+   edm::EDGetTokenT<edm::View<pat::Jet> >  ak8jetsToken_;
+   edm::EDGetTokenT<edm::View<pat::Jet> >  subak8jetsToken_;
+   //edm::EDGetTokenT<reco::GenParticleCollection> genparToken_;
+   
+   float ak4ptmin_, ak4etamax_, ak8ptmin_, ak8etamax_;
+
    edm::Service<TFileService> fs_;
-   TTree* tree_;// *t_looseElecs_;
+   TTree* tree_;
    
    EventInfoTree evt_; 
-   ElectronTree ele_;
+   ElectronTree  ele_;
+   JetTree       ak4jet_;
+   JetTree       ak8jet_;
 };
 
 //
@@ -106,9 +127,19 @@ VLQAnalyzer::VLQAnalyzer(const edm::ParameterSet& iConfig):
    //pileup_         (iConfig.getParameter<unsigned int>("pileup"))
    //vtxToken_       (consumes<reco::VertexCollection> (iConfig.getParameter<edm::InputTag>("vertices"))),
    vtxToken_       (consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vertices"))),
-   elecsToken_(consumes<std::vector<pat::Electron>>(iConfig.getParameter<edm::InputTag>("electrons"))),
-   bsToken_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot"))),
-   convToken_(consumes<std::vector<reco::Conversion>>(iConfig.getParameter<edm::InputTag>("conversions"))) 
+   elecsToken_     (consumes<std::vector<pat::Electron>>(iConfig.getParameter<edm::InputTag>("electrons"))),
+   bsToken_        (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot"))),
+   convToken_      (consumes<std::vector<reco::Conversion>>(iConfig.getParameter<edm::InputTag>("conversions"))),
+   metsToken_      (consumes<std::vector<pat::MET>>(iConfig.getParameter<edm::InputTag>("mets"))),
+   jetIDLoose_(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE), 
+   jetIDTight_(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT), 
+   ak4jetsToken_   (consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jets"))),
+   ak8jetsToken_   (consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jets_ak8"))),
+   subak8jetsToken_(consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("subjets_ak8"))),
+   ak4ptmin_       (iConfig.getParameter<double>("ak4ptmin")),
+   ak4etamax_      (iConfig.getParameter<double>("ak4etamax")),
+   ak8ptmin_       (iConfig.getParameter<double>("ak8ptmin")),
+   ak8etamax_      (iConfig.getParameter<double>("ak8etamax"))  
 {
    consumes<std::vector<PileupSummaryInfo>>(puInfo_);
    //now do what ever initialization is needed
@@ -136,25 +167,17 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
    evt_.clearTreeVectors();  
-   
+   ele_.clearTreeVectors();
+
    edm::Handle<std::vector< PileupSummaryInfo > > puInfo;
    iEvent.getByLabel(puInfo_, puInfo);
-   
-   Handle<std::vector<pat::Electron>> elecs;
-   iEvent.getByToken(elecsToken_, elecs);
-   Handle<reco::ConversionCollection> conversions;
-   iEvent.getByToken(convToken_, conversions);
-   Handle<reco::BeamSpot> bsHandle;
-   iEvent.getByToken(bsToken_, bsHandle);
-   const reco::BeamSpot &beamspot = *bsHandle.product(); 
-   
+ 
    evt_.runno = iEvent.eventAuxiliary().run();
    evt_.lumisec = iEvent.eventAuxiliary().luminosityBlock();
    evt_.evtno = iEvent.eventAuxiliary().event();
 
    std::vector<PileupSummaryInfo>::const_iterator pvi;
    for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
-      //std::cout << " Pileup Information: bunchXing, nInt, TrueNInt " << pvi->getBunchCrossing() << " " << pvi->getPU_NumInteractions() << " "<< pvi->getTrueNumInteractions() <<std::endl;
       evt_.npuTrue = pvi->getTrueNumInteractions(); 
       evt_.npuInt = pvi->getBunchCrossing(); 
       evt_.puBX = pvi->getPU_NumInteractions();
@@ -164,30 +187,196 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(vtxToken_, vertices);
    if (vertices->empty()) return;
    evt_.npv = vertices->size();
-   //evt_.nvtx = 0;
-   int nGoodVtx = 0;
+   evt_.nGoodVtx = 0;
+   int prVtx = -1;
    for (size_t i = 0; i < vertices->size(); i++) {
       if (vertices->at(i).isFake()) continue;
-      if (vertices->at(i).ndof() <= 4) continue;   
+      if (vertices->at(i).ndof() <= 4) continue; 
+      prVtx = i;  
+      //std::cout << "good vtx pt " << vertices->at(i).p4().pt() << std::endl;
       evt_.vPt2.push_back(vertices->at(i).p4().pt());
-      nGoodVtx++;
+      evt_.nGoodVtx++;
    }
-   evt_.nvtx = nGoodVtx;
-   //std::cout << "evt_.nvtx" <<evt_.nvtx << std::endl;
-   tree_->Fill();
-/*   
-#ifdef THIS_IS_AN_EVENT_EXAMPLE
-   Handle<ExampleData> pIn;
-   iEvent.getByLabel("example",pIn);
-#endif
-   
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-   ESHandle<SetupData> pSetup;
-   iSetup.get<SetupRecord>().get(pSetup);
-#endif
-*/
-}
+   auto primaryVertex=vertices->at(prVtx);
+  
+   //Electrons
+   Handle<std::vector<pat::Electron>> elecs;
+   iEvent.getByToken(elecsToken_, elecs);
+   Handle<reco::ConversionCollection> conversions;
+   iEvent.getByToken(convToken_, conversions);
+   Handle<reco::BeamSpot> bsHandle;
+   iEvent.getByToken(bsToken_, bsHandle);
+   //const reco::BeamSpot &beamspot = *bsHandle.product(); 
 
+   int nLooseEle(0), nMediumEle(0), nTightEle(0);
+
+   for (const pat::Electron & i : *elecs) {
+
+      if (i.pt() < 10.) continue;
+      if (fabs(i.eta()) > 3.) continue;
+
+      float mvaValue = i.userFloat("mvaValue");
+      bool isEB = i.isEB();
+      bool isLoose (0), isMedium (0), isTight (0);
+      
+       if( isEB ) {
+          if (i.pt() < 20.) {
+            isLoose  = (mvaValue > -0.661);
+            isMedium = (mvaValue > 0.855);
+            isTight  = (mvaValue > 0.986);
+         }
+         else {
+            isLoose  = (mvaValue > -0.797);
+            isMedium = (mvaValue > 0.723);
+            isTight  = (mvaValue > 0.988);
+         }
+      }
+      else {
+         if (not (i.userFloat("hgcElectronID:ecEnergy") > 0)) continue;
+         if (not (i.userFloat("hgcElectronID:sigmaUU") > 0)) continue;
+         if (not (i.fbrem() > -1)) continue;
+         if (not (i.userFloat("hgcElectronID:measuredDepth") < 40)) continue;
+         if (not (i.userFloat("hgcElectronID:nLayers") > 20)) continue;
+         if (i.pt() < 20.) {
+            isLoose = (mvaValue > -0.320);
+            isMedium = mvaValue > 0.777;
+            isTight = (mvaValue > 0.969);
+         }
+         else {
+            isLoose = (mvaValue > -0.919);
+            isMedium = mvaValue > 0.591;
+            isTight = (mvaValue > 0.983);
+         }
+      }
+
+      float dxy=0;
+      float dz=0;
+      if(i.gsfTrack().isNonnull()){
+         dxy=std::abs(i.gsfTrack()->dxy(primaryVertex.position()));
+         dz=std::abs(i.gsfTrack()->dz(primaryVertex.position()));
+      }
+      float iso =   i.puppiNoLeptonsChargedHadronIso() + i.puppiNoLeptonsNeutralHadronIso() + i.puppiNoLeptonsPhotonIso();
+
+      if (!isLoose) continue;
+      nLooseEle++;
+     
+      ele_.ptL.     push_back(i.pt()) ;
+      ele_.etaL.    push_back(i.eta());
+      ele_.phiL.    push_back(i.phi());
+      ele_.massL.   push_back(i.mass());
+      ele_.energyL. push_back(i.energy());
+      ele_.chargeL. push_back(i.charge());
+      ele_.dzL.     push_back(dz);
+      ele_.dxyL.    push_back(dxy); 
+      ele_.mvaL.    push_back(mvaValue);
+      ele_.relIsoL. push_back(iso/i.pt());
+
+      if (!isMedium) continue;
+      nMediumEle++;
+
+      ele_.ptM.     push_back(i.pt()) ;
+      ele_.etaM.    push_back(i.eta());
+      ele_.phiM.    push_back(i.phi());
+      ele_.massM.   push_back(i.mass());
+      ele_.energyM. push_back(i.energy());
+      ele_.chargeM. push_back(i.charge());
+      ele_.dzM.     push_back(dz);
+      ele_.dxyM.    push_back(dxy); 
+      ele_.mvaM.    push_back(mvaValue);
+      ele_.relIsoM. push_back(iso/i.pt());
+
+      if (!isTight) continue;
+      nTightEle++;   
+
+      ele_.ptT.     push_back(i.pt()) ;
+      ele_.etaT.    push_back(i.eta());
+      ele_.phiT.    push_back(i.phi());
+      ele_.massT.   push_back(i.mass());
+      ele_.energyT. push_back(i.energy());
+      ele_.chargeT. push_back(i.charge());
+      ele_.dzT.     push_back(dz);
+      ele_.dxyT.    push_back(dxy); 
+      ele_.mvaT.    push_back(mvaValue);
+      ele_.relIsoT. push_back(iso/i.pt());   
+   }
+   ele_.nL.     push_back(nLooseEle);
+   ele_.nM.     push_back(nMediumEle);
+   ele_.nT.     push_back(nTightEle);
+
+   //Jets
+   edm::Handle<edm::View<pat::Jet> > ak4jets;
+   iEvent.getByToken(ak4jetsToken_, ak4jets);
+   for (const pat::Jet & j : *ak4jets) {
+      if (j.pt() < ak4ptmin_ || abs(j.eta()) > ak4etamax_) continue; 
+      const reco::GenJet* genjet = j.genJet() ; 
+      if (genjet != nullptr) ak4jet_.genjetpt.push_back(j.genJet()->pt())  ;
+      else ak4jet_.genjetpt.push_back(-9999)  ;
+      ak4jet_.pt           .push_back(j.pt())  ;
+      ak4jet_.eta          .push_back(j.eta()) ;
+      ak4jet_.phi          .push_back(j.phi()) ;
+      ak4jet_.energy       .push_back(j.energy());
+      ak4jet_.mass         .push_back(j.mass());
+      ak4jet_.partonFlavour.push_back(j.partonFlavour()); 
+      ak4jet_.hadronFlavour.push_back(j.hadronFlavour()); 
+      ak4jet_.csvv2        .push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+      ak4jet_.deepcsv      .push_back(j.bDiscriminator("pfDeepCSVJetTags:probb") 
+                                       + j.bDiscriminator("pfDeepCSVJetTags:probbb"));
+      ak4jet_.pujetid      .push_back(j.userFloat("pileupJetId:fullDiscriminant")); 
+   } 
+   
+   edm::Handle<edm::View<pat::Jet> > ak8jets;
+   iEvent.getByToken(ak8jetsToken_, ak8jets);
+   for (const pat::Jet & j : *ak8jets) {
+      if (j.pt() < ak8ptmin_ || abs(j.eta()) > ak8etamax_) continue; 
+      const reco::GenJet* genjet = j.genJet() ; 
+      if (genjet != nullptr) ak8jet_.genjetpt.push_back(j.genJet()->pt())  ;
+      else ak8jet_.genjetpt.push_back(-9999)  ;
+      ak8jet_.pt               .push_back(j.pt())  ;
+      ak8jet_.eta              .push_back(j.eta()) ;
+      ak8jet_.phi              .push_back(j.phi()) ;
+      ak8jet_.energy           .push_back(j.energy());
+      ak8jet_.mass             .push_back(j.mass());
+      ak8jet_.ptCHS            .push_back(j.userFloat("ak8PFJetsCHSValueMap:pt"))  ;
+      ak8jet_.etaCHS           .push_back(j.userFloat("ak8PFJetsCHSValueMap:eta"))  ;
+      ak8jet_.phiCHS           .push_back(j.userFloat("ak8PFJetsCHSValueMap:phi"))  ;
+      ak8jet_.massCHS          .push_back(j.userFloat("ak8PFJetsCHSValueMap:mass"))  ;
+      ak8jet_.softDropMassCHS  .push_back(j.userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSSoftDropMass")) ;  
+      ak8jet_.prunedMassCHS    .push_back(j.userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSPrunedMass")) ;  
+      ak8jet_.tau1CHS          .push_back(j.userFloat("ak8PFJetsCHSValueMap:NjettinessAK8CHSTau1"));
+      ak8jet_.tau2CHS          .push_back(j.userFloat("ak8PFJetsCHSValueMap:NjettinessAK8CHSTau2")); 
+      ak8jet_.tau3CHS          .push_back(j.userFloat("ak8PFJetsCHSValueMap:NjettinessAK8CHSTau3"));
+      ak8jet_.softDropMassPuppi.push_back(j.userFloat("ak8PFJetsPuppiSoftDropMass")) ;  
+      ak8jet_.tau1Puppi        .push_back(j.userFloat("NjettinessAK8Puppi:tau1"));
+      ak8jet_.tau2Puppi        .push_back(j.userFloat("NjettinessAK8Puppi:tau2")); 
+      ak8jet_.tau3Puppi        .push_back(j.userFloat("NjettinessAK8Puppi:tau3"));
+      ak8jet_.csvv2            .push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+      ak8jet_.deepcsv          .push_back(j.bDiscriminator("pfDeepCSVJetTags:probb") 
+                                           + j.bDiscriminator("pfDeepCSVJetTags:probbb"));
+      ak8jet_.partonFlavour    .push_back(j.partonFlavour()); 
+      ak8jet_.hadronFlavour    .push_back(j.hadronFlavour()); 
+      
+      std::vector<edm::Ptr<pat::Jet> > const& sdsubjets = j.subjets("SoftDropPuppi") ;
+      if (sdsubjets.size() < 2) continue ;
+      ak8jet_.sj0pt           .push_back(sdsubjets.at(0)->pt()) ; 
+      ak8jet_.sj1pt           .push_back(sdsubjets.at(1)->pt()) ; 
+      ak8jet_.sj0eta          .push_back(sdsubjets.at(0)->eta()) ; 
+      ak8jet_.sj1eta          .push_back(sdsubjets.at(1)->eta()) ; 
+      ak8jet_.sj0phi          .push_back(sdsubjets.at(0)->phi()) ; 
+      ak8jet_.sj1phi          .push_back(sdsubjets.at(1)->phi()) ; 
+      ak8jet_.sj0partonFlavour.push_back(sdsubjets.at(0)->partonFlavour()); 
+      ak8jet_.sj0hadronFlavour.push_back(sdsubjets.at(0)->hadronFlavour()); 
+      ak8jet_.sj1partonFlavour.push_back(sdsubjets.at(1)->partonFlavour()); 
+      ak8jet_.sj1hadronFlavour.push_back(sdsubjets.at(1)->hadronFlavour()); 
+      ak8jet_.sj0csvv2        .push_back(sdsubjets.at(0)->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+      ak8jet_.sj1csvv2        .push_back(sdsubjets.at(1)->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+      ak8jet_.sj0deepcsv      .push_back(sdsubjets.at(0)->bDiscriminator("pfDeepCSVJetTags:probb") 
+                                          + sdsubjets.at(0)->bDiscriminator("pfDeepCSVJetTags:probbb"));
+      ak8jet_.sj1deepcsv      .push_back(sdsubjets.at(1)->bDiscriminator("pfDeepCSVJetTags:probb") 
+                                          + sdsubjets.at(1)->bDiscriminator("pfDeepCSVJetTags:probbb"));
+   }
+   
+   tree_->Fill();
+}
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
@@ -195,7 +384,9 @@ VLQAnalyzer::beginJob()
 {
   tree_ = fs_->make<TTree>("anatree", "anatree") ;
   evt_.RegisterTree(tree_, "SelectedEvt") ;
-  
+  ele_.RegisterTree(tree_, "Electons") ;
+  ak4jet_.RegisterTree(tree_, "AK4JetsCHS") ; 
+  ak8jet_.RegisterTree(tree_, "AK8Jets") ; 
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
