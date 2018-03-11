@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
 options = VarParsing ('python')
-options.register('outFilename', 'VLQTree.root',
+options.register('outFilename', 'test.root',
                  VarParsing.multiplicity.singleton,
                  VarParsing.varType.string,
                  "Output file name"
@@ -58,7 +58,7 @@ process.load("RecoEgamma.Phase2InterimID.phase2EgammaPAT_cff")
 elecLabel = "phase2Electrons"
 process.selectedElectrons = cms.EDFilter("CandPtrSelector",
                                          src = cms.InputTag(elecLabel),
-                                         cut = cms.string("pt>10 && abs(eta)<3")
+                                         cut = cms.string("pt>20 && abs(eta)<4")
 )
 process.preYieldFilter = cms.Sequence(process.selectedElectrons)
 
@@ -69,11 +69,13 @@ process.preYieldFilter = cms.Sequence(process.selectedElectrons)
 #process.puppiMet.src = cms.InputTag('puppi')
 
 process.ana = cms.EDAnalyzer("VLQAnalyzer",
+    genParts    = cms.InputTag("packedGenParticles"),    
     vertices    = cms.InputTag("offlineSlimmedPrimaryVertices"),
     puInfo      = cms.InputTag("slimmedAddPileupInfo"),
     electrons   = cms.InputTag("phase2Electrons"),
     beamspot    = cms.InputTag("offlineBeamSpot"),
     conversions = cms.InputTag("reducedEgamma", "reducedConversions", "PAT"),
+    genJets     = cms.InputTag("slimmedGenJets"),
     jets        = cms.InputTag("slimmedJets"),#slimmedJetsPuppi
     jets_ak8    = cms.InputTag("slimmedJetsAK8"),#slimmedJetsAK8Puppi
     mets        = cms.InputTag("slimmedMETs"),#slimmedMETsPuppi

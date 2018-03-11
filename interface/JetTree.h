@@ -7,6 +7,14 @@ class JetTree {
 public:
    std::vector<int>  idx; 
    std::vector<double> genjetpt;
+   std::vector<double> genjeteta;
+   std::vector<double> genjetphi;
+   std::vector<double> genjetenergy;
+   std::vector<double> genjetmass;
+   //std::vector<double> getjetp;
+   //std::vector<double> getjetpx;
+   //std::vector<double> getjetpy;
+   //std::vector<double> getjetpz;
    std::vector<double> pt;
    std::vector<double> eta;
    std::vector<double> phi;
@@ -47,7 +55,11 @@ public:
   
    void clearTreeVectors() {
       idx               .clear() ;     
-      genjetpt          .clear() ;    
+      genjetpt          .clear() ;
+      genjeteta         .clear() ;
+      genjetphi         .clear() ;
+      genjetenergy      .clear() ;
+      genjetmass        .clear() ;    
       pt                .clear() ;    
       eta               .clear() ;    
       phi               .clear() ;    
@@ -90,6 +102,10 @@ public:
    void RegisterTree(TTree* tree, std::string name="Jets") {
       tree->Branch((name+"_idx").c_str(), &idx); 
       tree->Branch((name+"_genjetpt").c_str(), &genjetpt); 
+      tree->Branch((name+"_genjeteta").c_str(), &genjeteta);
+      tree->Branch((name+"_genjetphi").c_str(), &genjetphi);
+      tree->Branch((name+"_genjetenergy").c_str(), &genjetenergy); 
+      tree->Branch((name+"_genjetmass").c_str(), &genjetmass);   
       tree->Branch((name+"_pt").c_str(), &pt); 
       tree->Branch((name+"_eta").c_str(), &eta);
       tree->Branch((name+"_phi").c_str(), &phi);

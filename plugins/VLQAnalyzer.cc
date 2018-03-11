@@ -54,6 +54,7 @@
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 
 #include "Upgrades/VLQAnalyzer/interface/EventInfoTree.h"
+#include "Upgrades/VLQAnalyzer/interface/MET.h"
 #include "Upgrades/VLQAnalyzer/interface/ElectronTree.h"
 #include "Upgrades/VLQAnalyzer/interface/JetTree.h"
 #include "TTree.h"
@@ -83,6 +84,9 @@ private:
    virtual void endJob() override;
    
    // ----------member data ---------------------------
+   edm::EDGetTokenT<std::vector<pat::PackedGenParticle>> genPartsToken_;
+   edm::EDGetTokenT<GenEventInfoProduct> genToken_;
+   edm::EDGetTokenT<LHEEventProduct>     genlheToken_;
    //unsigned int pileup_;
    //edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puInfo_;
    edm::InputTag puInfo_;
@@ -99,13 +103,15 @@ private:
    edm::EDGetTokenT<edm::View<pat::Jet> >  ak8jetsToken_;
    edm::EDGetTokenT<edm::View<pat::Jet> >  subak8jetsToken_;
    //edm::EDGetTokenT<reco::GenParticleCollection> genparToken_;
-   
+   edm::EDGetTokenT<std::vector<reco::GenJet>> genJetsToken_;
    float ak4ptmin_, ak4etamax_, ak8ptmin_, ak8etamax_;
 
    edm::Service<TFileService> fs_;
    TTree* tree_;
-   
+
+   GenInfoTree   genevt_;  
    EventInfoTree evt_; 
+   METTree       met_;
    ElectronTree  ele_;
    JetTree       ak4jet_;
    JetTree       ak8jet_;
@@ -123,6 +129,9 @@ private:
 // constructors and destructor
 //
 VLQAnalyzer::VLQAnalyzer(const edm::ParameterSet& iConfig):
+   genPartsToken_  (consumes<std::vector<pat::PackedGenParticle>>(iConfig.getParameter<edm::InputTag>("genParts"))),
+   genToken_       (consumes<GenEventInfoProduct>(edm::InputTag("generator"))),
+   genlheToken_    (consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer",""))),
    puInfo_         (iConfig.getParameter<edm::InputTag>("puInfo")),
    //pileup_         (iConfig.getParameter<unsigned int>("pileup"))
    //vtxToken_       (consumes<reco::VertexCollection> (iConfig.getParameter<edm::InputTag>("vertices"))),
@@ -131,15 +140,16 @@ VLQAnalyzer::VLQAnalyzer(const edm::ParameterSet& iConfig):
    bsToken_        (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot"))),
    convToken_      (consumes<std::vector<reco::Conversion>>(iConfig.getParameter<edm::InputTag>("conversions"))),
    metsToken_      (consumes<std::vector<pat::MET>>(iConfig.getParameter<edm::InputTag>("mets"))),
-   jetIDLoose_(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE), 
-   jetIDTight_(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT), 
+   jetIDLoose_     (PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE), 
+   jetIDTight_     (PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT), 
    ak4jetsToken_   (consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jets"))),
    ak8jetsToken_   (consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jets_ak8"))),
    subak8jetsToken_(consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("subjets_ak8"))),
+   genJetsToken_   (consumes<std::vector<reco::GenJet>>(iConfig.getParameter<edm::InputTag>("genJets"))),
    ak4ptmin_       (iConfig.getParameter<double>("ak4ptmin")),
    ak4etamax_      (iConfig.getParameter<double>("ak4etamax")),
    ak8ptmin_       (iConfig.getParameter<double>("ak8ptmin")),
-   ak8etamax_      (iConfig.getParameter<double>("ak8etamax"))  
+   ak8etamax_      (iConfig.getParameter<double>("ak8etamax"))
 {
    consumes<std::vector<PileupSummaryInfo>>(puInfo_);
    //now do what ever initialization is needed
@@ -166,15 +176,48 @@ void
 VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
+   genevt_.clearTreeVectors();  
    evt_.clearTreeVectors();  
    ele_.clearTreeVectors();
+   ak4jet_.clearTreeVectors();
+   ak8jet_.clearTreeVectors();
 
-   edm::Handle<std::vector< PileupSummaryInfo > > puInfo;
-   iEvent.getByLabel(puInfo_, puInfo);
- 
+   // Basic event info
    evt_.runno = iEvent.eventAuxiliary().run();
    evt_.lumisec = iEvent.eventAuxiliary().luminosityBlock();
    evt_.evtno = iEvent.eventAuxiliary().event();
+
+   //Generator weights
+   float genwt = 1.0;
+   edm::Handle<GenEventInfoProduct> genInfo;
+   iEvent.getByToken( genToken_,genInfo);
+   
+   if (genInfo.isValid()){
+      genwt = genInfo->weight();
+      genwt /= std::abs(genwt);   
+   }
+   genevt_.genWt = genwt;
+   
+   //LHE weight
+   edm::Handle<LHEEventProduct> lheInfo;
+   iEvent.getByToken(genlheToken_, lheInfo);
+
+   if(lheInfo.isValid()) {
+      double asdd = lheInfo->weights()[0].wgt;
+      int size = lheInfo->weights().size();
+      genevt_.lheWtIDs.reserve(size);
+      genevt_.lheWts.reserve(size);
+      for(unsigned int i=0; i<lheInfo->weights().size(); ++i) {         
+         double asdde =lheInfo->weights()[i].wgt;
+         int asddeID = std::stoi(lheInfo->weights()[i].id);
+         genevt_.lheWtIDs.push_back(asddeID);
+         genevt_.lheWts.push_back(asdde/asdd);
+      }
+   }
+   
+   //Pileup
+   edm::Handle<std::vector< PileupSummaryInfo > > puInfo;
+   iEvent.getByLabel(puInfo_, puInfo);
 
    std::vector<PileupSummaryInfo>::const_iterator pvi;
    for(pvi = puInfo->begin(); pvi != puInfo->end(); ++pvi) {
@@ -182,9 +225,10 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       evt_.npuInt = pvi->getBunchCrossing(); 
       evt_.puBX = pvi->getPU_NumInteractions();
    }
-   //std::cout << " next ... " << std::endl;
+  
    edm::Handle<reco::VertexCollection> vertices;
    iEvent.getByToken(vtxToken_, vertices);
+
    if (vertices->empty()) return;
    evt_.npv = vertices->size();
    evt_.nGoodVtx = 0;
@@ -193,27 +237,37 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if (vertices->at(i).isFake()) continue;
       if (vertices->at(i).ndof() <= 4) continue; 
       prVtx = i;  
-      //std::cout << "good vtx pt " << vertices->at(i).p4().pt() << std::endl;
       evt_.vPt2.push_back(vertices->at(i).p4().pt());
       evt_.nGoodVtx++;
    }
    auto primaryVertex=vertices->at(prVtx);
-  
+   
+   // MET
+   edm::Handle<std::vector<pat::MET>> mets;
+   iEvent.getByToken(metsToken_, mets);
+   if (mets->size() != 0 ){
+         met_.px = mets->at(0).px();
+         met_.py = mets->at(0).py();
+         met_.pt = mets->at(0).pt();
+         met_.eta = mets->at(0).eta();
+         met_.phi = mets->at(0).phi();
+      }
+
    //Electrons
-   Handle<std::vector<pat::Electron>> elecs;
+   edm::Handle<std::vector<pat::Electron>> elecs;
    iEvent.getByToken(elecsToken_, elecs);
-   Handle<reco::ConversionCollection> conversions;
-   iEvent.getByToken(convToken_, conversions);
-   Handle<reco::BeamSpot> bsHandle;
-   iEvent.getByToken(bsToken_, bsHandle);
+   //Handle<reco::ConversionCollection> conversions;
+   //iEvent.getByToken(convToken_, conversions);
+   //Handle<reco::BeamSpot> bsHandle;
+   //iEvent.getByToken(bsToken_, bsHandle);
    //const reco::BeamSpot &beamspot = *bsHandle.product(); 
 
-   int nLooseEle(0), nMediumEle(0), nTightEle(0);
-
+   //int nLooseEle(0), nMediumEle(0), nTightEle(0);
+   ele_.nLoose=0; ele_.nMedium=0.; ele_.nTight=0.;
    for (const pat::Electron & i : *elecs) {
 
       if (i.pt() < 10.) continue;
-      if (fabs(i.eta()) > 3.) continue;
+      if (fabs(i.eta()) > 4.) continue;
 
       float mvaValue = i.userFloat("mvaValue");
       bool isEB = i.isEB();
@@ -258,19 +312,26 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       float iso =   i.puppiNoLeptonsChargedHadronIso() + i.puppiNoLeptonsNeutralHadronIso() + i.puppiNoLeptonsPhotonIso();
 
       if (!isLoose) continue;
-      nLooseEle++;
+      
+      int eleType = 1*isLoose + 2*isMedium + 4*isTight;
+      ele_.eleWP.   push_back(eleType);
+      
+      if ( (eleType & 1) == 1) {ele_.nLoose++ ;}
+      if ( (eleType & 2) == 4) {ele_.nMedium++ ;}
+      if ( (eleType & 4) == 4) {ele_.nTight++ ;}
+      //nLooseEle++;
      
-      ele_.ptL.     push_back(i.pt()) ;
-      ele_.etaL.    push_back(i.eta());
-      ele_.phiL.    push_back(i.phi());
-      ele_.massL.   push_back(i.mass());
-      ele_.energyL. push_back(i.energy());
-      ele_.chargeL. push_back(i.charge());
-      ele_.dzL.     push_back(dz);
-      ele_.dxyL.    push_back(dxy); 
-      ele_.mvaL.    push_back(mvaValue);
-      ele_.relIsoL. push_back(iso/i.pt());
-
+      ele_.pt.     push_back(i.pt()) ;
+      ele_.eta.    push_back(i.eta());
+      ele_.phi.    push_back(i.phi());
+      ele_.mass.   push_back(i.mass());
+      ele_.energy. push_back(i.energy());
+      ele_.charge. push_back(i.charge());
+      ele_.dz.     push_back(dz);
+      ele_.dxy.    push_back(dxy); 
+      ele_.mva.    push_back(mvaValue);
+      ele_.relIso. push_back(iso/i.pt());
+/*
       if (!isMedium) continue;
       nMediumEle++;
 
@@ -302,15 +363,50 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    ele_.nL.     push_back(nLooseEle);
    ele_.nM.     push_back(nMediumEle);
    ele_.nT.     push_back(nTightEle);
-
+*/
+   }
+   //Gen Jets
+   std::vector<reco::GenJet> cleanGenJets;
+   
+   edm::Handle<std::vector<pat::PackedGenParticle>> genParts;
+   iEvent.getByToken(genPartsToken_, genParts);
+   
    //Jets
    edm::Handle<edm::View<pat::Jet> > ak4jets;
    iEvent.getByToken(ak4jetsToken_, ak4jets);
+
    for (const pat::Jet & j : *ak4jets) {
       if (j.pt() < ak4ptmin_ || abs(j.eta()) > ak4etamax_) continue; 
-      const reco::GenJet* genjet = j.genJet() ; 
-      if (genjet != nullptr) ak4jet_.genjetpt.push_back(j.genJet()->pt())  ;
-      else ak4jet_.genjetpt.push_back(-9999)  ;
+      
+      const reco::GenJet* genjet = j.genJet() ;
+      bool overlaps = false;
+      
+      for (const pat::PackedGenParticle & gp : *genParts) {
+         if (abs(gp.pdgId()) != 11 && abs(gp.pdgId()) != 13) continue;
+         if (genjet != nullptr && 
+             fabs(j.genJet()->pt()-gp.pt()) < 0.01*gp.pt() && 
+             ROOT::Math::VectorUtil::DeltaR(gp.p4(),j.genJet()->p4()) < 0.01) 
+         {overlaps = true; break;}
+      }
+      
+      if (genjet != nullptr && !overlaps) {// || !overlaps
+         ak4jet_.genjetpt.push_back(j.genJet()->pt());
+         ak4jet_.genjeteta.push_back(j.genJet()->eta());
+         ak4jet_.genjetphi.push_back(j.genJet()->phi());
+         ak4jet_.genjetenergy.push_back(j.genJet()->energy());
+         ak4jet_.genjetmass.push_back(j.genJet()->mass()) ;
+         cleanGenJets.push_back(*genjet);
+      }
+      else {
+         ak4jet_.genjetpt.push_back(-9999)    ;
+         ak4jet_.genjeteta.push_back(-9999)   ;
+         ak4jet_.genjetphi.push_back(-9999)   ;
+         ak4jet_.genjetenergy.push_back(-9999);  
+         ak4jet_.genjetmass.push_back(-9999)  ;
+         //std::cout << ", overlaps : " << overlaps << std::endl;
+      }
+
+
       ak4jet_.pt           .push_back(j.pt())  ;
       ak4jet_.eta          .push_back(j.eta()) ;
       ak4jet_.phi          .push_back(j.phi()) ;
@@ -323,14 +419,18 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                                        + j.bDiscriminator("pfDeepCSVJetTags:probbb"));
       ak4jet_.pujetid      .push_back(j.userFloat("pileupJetId:fullDiscriminant")); 
    } 
-   
+     
    edm::Handle<edm::View<pat::Jet> > ak8jets;
    iEvent.getByToken(ak8jetsToken_, ak8jets);
    for (const pat::Jet & j : *ak8jets) {
       if (j.pt() < ak8ptmin_ || abs(j.eta()) > ak8etamax_) continue; 
       const reco::GenJet* genjet = j.genJet() ; 
-      if (genjet != nullptr) ak8jet_.genjetpt.push_back(j.genJet()->pt())  ;
-      else ak8jet_.genjetpt.push_back(-9999)  ;
+      if (genjet != nullptr) {
+         ak8jet_.genjetpt.push_back(j.genJet()->pt())  ;
+      }
+      else {
+         ak8jet_.genjetpt.push_back(-9999)  ;
+      }
       ak8jet_.pt               .push_back(j.pt())  ;
       ak8jet_.eta              .push_back(j.eta()) ;
       ak8jet_.phi              .push_back(j.phi()) ;
@@ -375,6 +475,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                                           + sdsubjets.at(1)->bDiscriminator("pfDeepCSVJetTags:probbb"));
    }
    
+   //std::cout << "to this end : " << std::endl;
    tree_->Fill();
 }
 
@@ -384,7 +485,9 @@ VLQAnalyzer::beginJob()
 {
   tree_ = fs_->make<TTree>("anatree", "anatree") ;
   evt_.RegisterTree(tree_, "SelectedEvt") ;
+  genevt_.RegisterTree(tree_, "GenEvt") ;
   ele_.RegisterTree(tree_, "Electons") ;
+  met_.RegisterTree(tree_, "MET");
   ak4jet_.RegisterTree(tree_, "AK4JetsCHS") ; 
   ak8jet_.RegisterTree(tree_, "AK8Jets") ; 
 }
