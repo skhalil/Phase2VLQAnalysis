@@ -54,8 +54,9 @@
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 
 #include "Upgrades/VLQAnalyzer/interface/EventInfoTree.h"
-#include "Upgrades/VLQAnalyzer/interface/MET.h"
+#include "Upgrades/VLQAnalyzer/interface/METTree.h"
 #include "Upgrades/VLQAnalyzer/interface/ElectronTree.h"
+#include "Upgrades/VLQAnalyzer/interface/MuonTree.h"
 #include "Upgrades/VLQAnalyzer/interface/JetTree.h"
 #include "TTree.h"
 #include "TFile.h"
@@ -93,6 +94,7 @@ private:
    //edm::EDGetTokenT<reco::VertexCollection >   vtxToken_;
    edm::EDGetTokenT<std::vector<reco::Vertex>>     vtxToken_;
    edm::EDGetTokenT<std::vector<pat::Electron>>    elecsToken_;
+   edm::EDGetTokenT<std::vector<pat::Muon>>        muonToken_;
    edm::EDGetTokenT<reco::BeamSpot>                bsToken_;
    edm::EDGetTokenT<std::vector<reco::Conversion>> convToken_;
    
@@ -113,6 +115,7 @@ private:
    EventInfoTree evt_; 
    METTree       met_;
    ElectronTree  ele_;
+   MuonTree      mu_;
    JetTree       ak4jet_;
    JetTree       ak8jet_;
 };
@@ -137,6 +140,7 @@ VLQAnalyzer::VLQAnalyzer(const edm::ParameterSet& iConfig):
    //vtxToken_       (consumes<reco::VertexCollection> (iConfig.getParameter<edm::InputTag>("vertices"))),
    vtxToken_       (consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vertices"))),
    elecsToken_     (consumes<std::vector<pat::Electron>>(iConfig.getParameter<edm::InputTag>("electrons"))),
+   muonToken_      (consumes<std::vector<pat::Muon>>(iConfig.getParameter<edm::InputTag>("muons"))),
    bsToken_        (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot"))),
    convToken_      (consumes<std::vector<reco::Conversion>>(iConfig.getParameter<edm::InputTag>("conversions"))),
    metsToken_      (consumes<std::vector<pat::MET>>(iConfig.getParameter<edm::InputTag>("mets"))),
@@ -179,6 +183,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    genevt_.clearTreeVectors();  
    evt_.clearTreeVectors();  
    ele_.clearTreeVectors();
+   mu_.clearTreeVectors();
    ak4jet_.clearTreeVectors();
    ak8jet_.clearTreeVectors();
 
@@ -262,11 +267,10 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //iEvent.getByToken(bsToken_, bsHandle);
    //const reco::BeamSpot &beamspot = *bsHandle.product(); 
 
-   //int nLooseEle(0), nMediumEle(0), nTightEle(0);
    ele_.nLoose=0; ele_.nMedium=0.; ele_.nTight=0.;
    for (const pat::Electron & i : *elecs) {
 
-      if (i.pt() < 10.) continue;
+      if (i.pt() < 20.) continue;
       if (fabs(i.eta()) > 4.) continue;
 
       float mvaValue = i.userFloat("mvaValue");
@@ -319,7 +323,6 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if ( (eleType & 1) == 1) {ele_.nLoose++ ;}
       if ( (eleType & 2) == 4) {ele_.nMedium++ ;}
       if ( (eleType & 4) == 4) {ele_.nTight++ ;}
-      //nLooseEle++;
      
       ele_.pt.     push_back(i.pt()) ;
       ele_.eta.    push_back(i.eta());
@@ -331,39 +334,20 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       ele_.dxy.    push_back(dxy); 
       ele_.mva.    push_back(mvaValue);
       ele_.relIso. push_back(iso/i.pt());
-/*
-      if (!isMedium) continue;
-      nMediumEle++;
-
-      ele_.ptM.     push_back(i.pt()) ;
-      ele_.etaM.    push_back(i.eta());
-      ele_.phiM.    push_back(i.phi());
-      ele_.massM.   push_back(i.mass());
-      ele_.energyM. push_back(i.energy());
-      ele_.chargeM. push_back(i.charge());
-      ele_.dzM.     push_back(dz);
-      ele_.dxyM.    push_back(dxy); 
-      ele_.mvaM.    push_back(mvaValue);
-      ele_.relIsoM. push_back(iso/i.pt());
-
-      if (!isTight) continue;
-      nTightEle++;   
-
-      ele_.ptT.     push_back(i.pt()) ;
-      ele_.etaT.    push_back(i.eta());
-      ele_.phiT.    push_back(i.phi());
-      ele_.massT.   push_back(i.mass());
-      ele_.energyT. push_back(i.energy());
-      ele_.chargeT. push_back(i.charge());
-      ele_.dzT.     push_back(dz);
-      ele_.dxyT.    push_back(dxy); 
-      ele_.mvaT.    push_back(mvaValue);
-      ele_.relIsoT. push_back(iso/i.pt());   
    }
-   ele_.nL.     push_back(nLooseEle);
-   ele_.nM.     push_back(nMediumEle);
-   ele_.nT.     push_back(nTightEle);
-*/
+
+   //Muons
+   Handle<std::vector<pat::Muon>> muons;
+   iEvent.getByToken(muonsToken_, mus);
+
+   mu_.nLoose=0; mu_.nMedium=0.; mu_.nTight=0.;
+   for (const pat::Muon & i : *mus) {
+      if (i.pt() < 20.) continue;
+      if (fabs(i.eta()) > 4.) continue;
+      //Loose
+      bool isLoose (0), isMedium (0), isTight (0);
+      double dPhiCut = std::min(std::max(1.2/i.p(),1.2/100),0.056);
+      double dPhiBendCut = std::min(std::max(0.2/i.p(),0.2/100),0.0096); 
    }
    //Gen Jets
    std::vector<reco::GenJet> cleanGenJets;
@@ -389,7 +373,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          {overlaps = true; break;}
       }
       
-      if (genjet != nullptr && !overlaps) {// || !overlaps
+      if (genjet != nullptr && !overlaps) {
          ak4jet_.genjetpt.push_back(j.genJet()->pt());
          ak4jet_.genjeteta.push_back(j.genJet()->eta());
          ak4jet_.genjetphi.push_back(j.genJet()->phi());
@@ -403,9 +387,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          ak4jet_.genjetphi.push_back(-9999)   ;
          ak4jet_.genjetenergy.push_back(-9999);  
          ak4jet_.genjetmass.push_back(-9999)  ;
-         //std::cout << ", overlaps : " << overlaps << std::endl;
       }
-
 
       ak4jet_.pt           .push_back(j.pt())  ;
       ak4jet_.eta          .push_back(j.eta()) ;
