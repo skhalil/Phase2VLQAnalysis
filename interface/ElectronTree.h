@@ -32,7 +32,7 @@ public:
       relIso.clear();
    }
 
-   void RegisterTree(TTree* tree, std::string name="Electons") {
+   void RegisterTree(TTree* tree, std::string name="Electrons") {
       tree->Branch((name+"_nLoose") .c_str(), &nLoose);
       tree->Branch((name+"_nMedium").c_str(), &nMedium);   
       tree->Branch((name+"_nTight") .c_str(), &nTight);

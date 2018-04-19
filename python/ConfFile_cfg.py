@@ -54,42 +54,15 @@ process.GlobalTag = GlobalTag(process.GlobalTag, '93X_upgrade2023_realistic_v2',
 # HGCAL EGamma ID
 process.load("RecoEgamma.Phase2InterimID.phase2EgammaPAT_cff")
 
-# Skim filter
-elecLabel = "phase2Electrons"
-process.selectedElectrons = cms.EDFilter("CandPtrSelector",
-                                         src = cms.InputTag(elecLabel),
-                                         cut = cms.string("pt>20 && abs(eta)<4")
-)
-process.preYieldFilter = cms.Sequence(process.selectedElectrons)
+# load the input tags
+process.ana = cms.EDAnalyzer("VLQAnalyzer")
+process.load("Upgrades.VLQAnalyzer.CfiFile_cfi")
 
-
-# recompute MET
-#process.load('RecoMET.METProducers.PFMET_cfi')
-#process.puppiMet = process.pfMet.clone()
-#process.puppiMet.src = cms.InputTag('puppi')
-
-process.ana = cms.EDAnalyzer("VLQAnalyzer",
-    genParts    = cms.InputTag("packedGenParticles"),    
-    vertices    = cms.InputTag("offlineSlimmedPrimaryVertices"),
-    puInfo      = cms.InputTag("slimmedAddPileupInfo"),
-    electrons   = cms.InputTag("phase2Electrons"),
-    beamspot    = cms.InputTag("offlineBeamSpot"),
-    conversions = cms.InputTag("reducedEgamma", "reducedConversions", "PAT"),
-    genJets     = cms.InputTag("slimmedGenJets"),
-    jets        = cms.InputTag("slimmedJets"),#slimmedJetsPuppi
-    jets_ak8    = cms.InputTag("slimmedJetsAK8"),#slimmedJetsAK8Puppi
-    mets        = cms.InputTag("slimmedMETs"),#slimmedMETsPuppi
-    subjets_ak8  = cms.InputTag("slimmedJets"),
-    ak4ptmin     = cms.double(20.), 
-    ak4etamax    = cms.double(5.), 
-    ak8ptmin     = cms.double(200.), 
-    ak8etamax = cms.double(3.), 
-    #pileup = cms.uint32(200),
-)
-
+# load the output root file service routine
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string(options.outFilename))
 
+# sequence the process
 process.p = cms.Path(process.phase2Egamma * process.ana)
 
 process.options   = cms.untracked.PSet(

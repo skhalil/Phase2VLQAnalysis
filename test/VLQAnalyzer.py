@@ -67,14 +67,34 @@ for fname in fnames:
     
     ievt += 1
 
-    # call the HepMC weights
-    evtwt = 1.
-
+    # call the Gen weights
+    evtwt = t.GenEvt_genWt
     hCutflow.Fill(1, evtwt)
 
+    # require at least one good primary vertix
     vertices = t.SelectedEvt_nGoodVtx
-    print 'nvertices = ', vertices
-    nEleTight = len(t.Electons_ptT)
-    nET = t.Electons_nT.size()
-    print 'from pt = ', nEleTight, 'from total = ', nET
+    if vertices == 0: continue
+    hCutflow.Fill(2, evtwt)
+
+  # require exactly one medium WP electron or muon in event
+
+
+  # loop on electrons, selecting medium WP electrons
+    nmedium=0
+    for i in range(0, len(t.Electons_pt)):
+      eWP = t.Electons_eleWP[i]
+      print 'eWP =', eWP
+      # choose the medium WP: 1 = loose, 2 = medium, 4 = tight
+      if (eWP & 2) != 2: continue
+      nmedium += 1
+       
+      #if (eWP & 1) == 1 : loose_ele = 1 
+      #if (eWP & 2) == 2 : medium_ele = 1
+      #if (eWP & 4) == 4 : tight_ele = 1
+      
+      #print 'loose = ', loose_ele, 'medium = ', medium_ele, 'tight = ', tight_ele
+    #if not tight_ele: 
+    
+    nET = t.Electons_nMedium
+    print 'nMedium = ', ntight, 'nMedium = ', nET
     #print ievt

@@ -23,12 +23,10 @@
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
-
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
@@ -50,6 +48,17 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
+
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
+#include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
+#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
+#include "SimTracker/Records/interface/TrackAssociatorRecord.h"
+
+#include "Geometry/Records/interface/MuonGeometryRecord.h"
+#include "Geometry/GEMGeometry/interface/ME0EtaPartitionSpecs.h"
+#include "Geometry/GEMGeometry/interface/ME0Geometry.h"
 
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 
@@ -80,32 +89,31 @@ public:
    
    
 private:
+   virtual void beginRun(edm::Run const&, edm::EventSetup const&); //override;
    virtual void beginJob() override;
    virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+   virtual void endRun(edm::Run const&, edm::EventSetup const&); //override;
    virtual void endJob() override;
    
+   bool isME0MuonSelNew(const reco::Muon&, double, double, double, edm::EventSetup const& ); //copy paste from Jan & Maria
+
    // ----------member data ---------------------------
    edm::EDGetTokenT<std::vector<pat::PackedGenParticle>> genPartsToken_;
-   edm::EDGetTokenT<GenEventInfoProduct> genToken_;
-   edm::EDGetTokenT<LHEEventProduct>     genlheToken_;
-   //unsigned int pileup_;
-   //edm::EDGetTokenT<std::vector<PileupSummaryInfo>> puInfo_;
-   edm::InputTag puInfo_;
-   //edm::EDGetTokenT<reco::VertexCollection >   vtxToken_;
-   edm::EDGetTokenT<std::vector<reco::Vertex>>     vtxToken_;
-   edm::EDGetTokenT<std::vector<pat::Electron>>    elecsToken_;
-   edm::EDGetTokenT<std::vector<pat::Muon>>        muonToken_;
-   edm::EDGetTokenT<reco::BeamSpot>                bsToken_;
-   edm::EDGetTokenT<std::vector<reco::Conversion>> convToken_;
-   
-   edm::EDGetTokenT<std::vector<pat::MET>> metsToken_;
-   PFJetIDSelectionFunctor                 jetIDLoose_;
-   PFJetIDSelectionFunctor                 jetIDTight_;
-   edm::EDGetTokenT<edm::View<pat::Jet> >  ak4jetsToken_;
-   edm::EDGetTokenT<edm::View<pat::Jet> >  ak8jetsToken_;
-   edm::EDGetTokenT<edm::View<pat::Jet> >  subak8jetsToken_;
-   //edm::EDGetTokenT<reco::GenParticleCollection> genparToken_;
-   edm::EDGetTokenT<std::vector<reco::GenJet>> genJetsToken_;
+   edm::EDGetTokenT<GenEventInfoProduct>         genToken_;
+   edm::EDGetTokenT<LHEEventProduct>             genlheToken_;
+   edm::InputTag                                 puInfo_;
+   edm::EDGetTokenT<std::vector<reco::Vertex>>   vtxToken_;
+   edm::EDGetTokenT<std::vector<pat::Electron>>  elecsToken_;
+   edm::EDGetTokenT<std::vector<pat::Muon>>      muonsToken_;
+   edm::EDGetTokenT<std::vector<pat::MET>>       metsToken_;
+   PFJetIDSelectionFunctor                       jetIDLoose_;
+   PFJetIDSelectionFunctor                       jetIDTight_;
+   edm::EDGetTokenT<edm::View<pat::Jet> >        ak4jetsToken_;
+   edm::EDGetTokenT<edm::View<pat::Jet> >        ak8jetsToken_;
+   edm::EDGetTokenT<edm::View<pat::Jet> >        subak8jetsToken_;
+   edm::EDGetTokenT<std::vector<reco::GenJet>>   genJetsToken_;
+
+   const ME0Geometry* ME0Geometry_; 
    float ak4ptmin_, ak4etamax_, ak8ptmin_, ak8etamax_;
 
    edm::Service<TFileService> fs_;
@@ -136,13 +144,9 @@ VLQAnalyzer::VLQAnalyzer(const edm::ParameterSet& iConfig):
    genToken_       (consumes<GenEventInfoProduct>(edm::InputTag("generator"))),
    genlheToken_    (consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer",""))),
    puInfo_         (iConfig.getParameter<edm::InputTag>("puInfo")),
-   //pileup_         (iConfig.getParameter<unsigned int>("pileup"))
-   //vtxToken_       (consumes<reco::VertexCollection> (iConfig.getParameter<edm::InputTag>("vertices"))),
    vtxToken_       (consumes<std::vector<reco::Vertex>>(iConfig.getParameter<edm::InputTag>("vertices"))),
    elecsToken_     (consumes<std::vector<pat::Electron>>(iConfig.getParameter<edm::InputTag>("electrons"))),
-   muonToken_      (consumes<std::vector<pat::Muon>>(iConfig.getParameter<edm::InputTag>("muons"))),
-   bsToken_        (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamspot"))),
-   convToken_      (consumes<std::vector<reco::Conversion>>(iConfig.getParameter<edm::InputTag>("conversions"))),
+   muonsToken_     (consumes<std::vector<pat::Muon>>(iConfig.getParameter<edm::InputTag>("muons"))),
    metsToken_      (consumes<std::vector<pat::MET>>(iConfig.getParameter<edm::InputTag>("mets"))),
    jetIDLoose_     (PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE), 
    jetIDTight_     (PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT), 
@@ -235,8 +239,9 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(vtxToken_, vertices);
 
    if (vertices->empty()) return;
+   evt_.npv=0; evt_.nGoodVtx = 0;
    evt_.npv = vertices->size();
-   evt_.nGoodVtx = 0;
+   
    int prVtx = -1;
    for (size_t i = 0; i < vertices->size(); i++) {
       if (vertices->at(i).isFake()) continue;
@@ -250,6 +255,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    // MET
    edm::Handle<std::vector<pat::MET>> mets;
    iEvent.getByToken(metsToken_, mets);
+   met_.px=0.;  met_.py=0.; met_.pt=0.; met_.eta=0.; met_.phi=0.;
    if (mets->size() != 0 ){
          met_.px = mets->at(0).px();
          met_.py = mets->at(0).py();
@@ -261,18 +267,11 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //Electrons
    edm::Handle<std::vector<pat::Electron>> elecs;
    iEvent.getByToken(elecsToken_, elecs);
-   //Handle<reco::ConversionCollection> conversions;
-   //iEvent.getByToken(convToken_, conversions);
-   //Handle<reco::BeamSpot> bsHandle;
-   //iEvent.getByToken(bsToken_, bsHandle);
-   //const reco::BeamSpot &beamspot = *bsHandle.product(); 
-
+    
    ele_.nLoose=0; ele_.nMedium=0.; ele_.nTight=0.;
    for (const pat::Electron & i : *elecs) {
-
       if (i.pt() < 20.) continue;
       if (fabs(i.eta()) > 4.) continue;
-
       float mvaValue = i.userFloat("mvaValue");
       bool isEB = i.isEB();
       bool isLoose (0), isMedium (0), isTight (0);
@@ -321,7 +320,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       ele_.eleWP.   push_back(eleType);
       
       if ( (eleType & 1) == 1) {ele_.nLoose++ ;}
-      if ( (eleType & 2) == 4) {ele_.nMedium++ ;}
+      if ( (eleType & 2) == 2) {ele_.nMedium++ ;}
       if ( (eleType & 4) == 4) {ele_.nTight++ ;}
      
       ele_.pt.     push_back(i.pt()) ;
@@ -337,7 +336,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
 
    //Muons
-   Handle<std::vector<pat::Muon>> muons;
+   Handle<std::vector<pat::Muon>> mus;
    iEvent.getByToken(muonsToken_, mus);
 
    mu_.nLoose=0; mu_.nMedium=0.; mu_.nTight=0.;
@@ -345,10 +344,31 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if (i.pt() < 20.) continue;
       if (fabs(i.eta()) > 4.) continue;
       //Loose
-      bool isLoose (0), isMedium (0), isTight (0);
+      //bool isLoose (0), isMedium (0), isTight (0);
       double dPhiCut = std::min(std::max(1.2/i.p(),1.2/100),0.056);
       double dPhiBendCut = std::min(std::max(0.2/i.p(),0.2/100),0.0096); 
+      
+      bool isLoose = (fabs(i.eta()) < 2.4 && muon::isLooseMuon(i)) || (fabs(i.eta()) > 2.4 && 
+                      isME0MuonSelNew(i, 0.077, dPhiCut, dPhiBendCut,iSetup));
+      //std::cout << "isLoose : " << isLoose << std::endl;
+      // Medium ID -- needs to be updated
+      bool ipxy = false, ipz = false, validPxlHit = false, highPurity = false;
+      float dz=0, dxy=0;
+      if (i.innerTrack().isNonnull()){
+         dxy=std::abs(i.muonBestTrack()->dxy(vertices->at(prVtx).position()));
+         dz= std::abs(i.muonBestTrack()->dz(vertices->at(prVtx).position()));
+         ipxy = dxy < 0.2;
+         ipz = dz < 0.5;
+         validPxlHit = i.innerTrack()->hitPattern().numberOfValidPixelHits() > 0;
+         highPurity = i.innerTrack()->quality(reco::Track::highPurity);
+      } 
+      bool isMedium = (fabs(i.eta()) < 2.4 && muon::isMediumMuon(i)) || (fabs(i.eta()) > 2.4 && 
+                       isME0MuonSelNew(i, 0.077, dPhiCut, dPhiBendCut, iSetup) && ipxy && ipz && validPxlHit && highPurity);
+
+      
+
    }
+
    //Gen Jets
    std::vector<reco::GenJet> cleanGenJets;
    
@@ -459,6 +479,76 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    
    //std::cout << "to this end : " << std::endl;
    tree_->Fill();
+}
+
+// ------------ private functions --------------
+bool
+VLQAnalyzer::isME0MuonSelNew(const reco::Muon& muon, double dEtaCut, double dPhiCut, double dPhiBendCut, edm::EventSetup const& iSetup)
+{
+   bool result = false;
+   bool isME0 = muon.isME0Muon();
+
+  if(isME0){
+     double deltaEta = 999;
+     double deltaPhi = 999;
+     double deltaPhiBend = 999;
+     
+     if(!ME0Geometry_){
+       edm::ESHandle<ME0Geometry> hGeom;
+       iSetup.get<MuonGeometryRecord>().get(hGeom);
+       ME0Geometry_ =( &*hGeom);
+       if(!ME0Geometry_)
+          return false;
+    }
+
+     const std::vector<reco::MuonChamberMatch>& chambers = muon.matches();
+     for( std::vector<reco::MuonChamberMatch>::const_iterator chamber = chambers.begin(); chamber != chambers.end(); ++chamber ){       
+        if (chamber->detector() == 5){
+           
+           for ( std::vector<reco::MuonSegmentMatch>::const_iterator segment = chamber->me0Matches.begin(); 
+                 segment != chamber->me0Matches.end(); ++segment ){
+
+             LocalPoint trk_loc_coord(chamber->x, chamber->y, 0);
+             LocalPoint seg_loc_coord(segment->x, segment->y, 0);
+             LocalVector trk_loc_vec(chamber->dXdZ, chamber->dYdZ, 1);
+             LocalVector seg_loc_vec(segment->dXdZ, segment->dYdZ, 1);
+             
+             const ME0Chamber * me0chamber = ME0Geometry_->chamber(chamber->id);
+             if(!me0chamber)continue;
+             
+             GlobalPoint trk_glb_coord = me0chamber->toGlobal(trk_loc_coord);
+             GlobalPoint seg_glb_coord = me0chamber->toGlobal(seg_loc_coord);
+             
+             //double segDPhi = segment->me0SegmentRef->deltaPhi();
+             // need to check if this works
+             double segDPhi = me0chamber->computeDeltaPhi(seg_loc_coord, seg_loc_vec);
+             double trackDPhi = me0chamber->computeDeltaPhi(trk_loc_coord, trk_loc_vec);
+             
+             deltaEta = std::abs(trk_glb_coord.eta() - seg_glb_coord.eta() );
+             deltaPhi = std::abs(trk_glb_coord.phi() - seg_glb_coord.phi() );
+             deltaPhiBend = std::abs(segDPhi - trackDPhi);
+             
+             if (deltaEta < dEtaCut && deltaPhi < dPhiCut && deltaPhiBend < dPhiBendCut) result = true;
+          }
+       }
+    }//for loop
+  }//if
+  return result;
+}
+
+// ------------ method called once each run ----------------
+void
+VLQAnalyzer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
+{
+  edm::ESHandle<ME0Geometry> hGeom;
+  iSetup.get<MuonGeometryRecord>().get(hGeom);
+  ME0Geometry_ =( &*hGeom);
+}
+
+// ------------ method called when ending the processing of a run  ------------
+  void
+VLQAnalyzer::endRun(edm::Run const&, edm::EventSetup const&)
+{
 }
 
 // ------------ method called once each job just before starting event loop  ------------

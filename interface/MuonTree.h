@@ -32,11 +32,11 @@ public:
       relIso.clear();
    }
 
-   void RegisterTree(TTree* tree, std::string name="Electons") {
+   void RegisterTree(TTree* tree, std::string name="Muons") {
       tree->Branch((name+"_nLoose") .c_str(), &nLoose);
       tree->Branch((name+"_nMedium").c_str(), &nMedium);   
       tree->Branch((name+"_nTight") .c_str(), &nTight);
-      tree->Branch((name+"_muWP")  .c_str(), &eleWP);
+      tree->Branch((name+"_muWP")   .c_str(), &muWP);
       tree->Branch((name+"_pt")     .c_str(), &pt);
       tree->Branch((name+"_eta")    .c_str(), &eta); 
       tree->Branch((name+"_phi")    .c_str(), &phi);
