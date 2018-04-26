@@ -1,0 +1,688 @@
+DEBUG 2018-02-15 13:34:45,203: 	 Executing command: 'submit'
+DEBUG 2018-02-15 13:34:45,211: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-02-15 13:34:45,220: 	 Checking credentials
+DEBUG 2018-02-15 13:34:45,220: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-02-15 13:34:45,220: 	 Getting proxy life time left
+DEBUG 2018-02-15 13:34:45,323: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 86247
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 13:34:45,426: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 86247
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 13:34:45,426: 	 Proxy valid for 23:57:27 hours
+DEBUG 2018-02-15 13:34:45,427: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-02-15 13:41:23,839: 	 Executing command: 'submit'
+DEBUG 2018-02-15 13:41:23,843: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-02-15 13:41:23,852: 	 Checking credentials
+DEBUG 2018-02-15 13:41:23,853: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-02-15 13:41:23,853: 	 Getting proxy life time left
+DEBUG 2018-02-15 13:41:23,956: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 85849
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 13:41:24,059: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 85848
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 13:41:24,060: 	 Proxy valid for 23:50:49 hours
+DEBUG 2018-02-15 13:41:24,060: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-02-15 14:28:31,158: 	 Executing command: 'submit'
+DEBUG 2018-02-15 14:28:31,160: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-02-15 14:28:31,168: 	 Checking credentials
+DEBUG 2018-02-15 14:28:31,168: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-02-15 14:28:31,168: 	 Getting proxy life time left
+DEBUG 2018-02-15 14:28:31,271: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 83021
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 14:28:31,374: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 83021
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 14:28:31,375: 	 Proxy valid for 23:03:41 hours
+DEBUG 2018-02-15 14:28:31,376: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-02-15 14:30:42,281: 	 Executing command: 'submit'
+DEBUG 2018-02-15 14:30:42,283: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-02-15 14:30:42,290: 	 Checking credentials
+DEBUG 2018-02-15 14:30:42,290: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-02-15 14:30:42,290: 	 Getting proxy life time left
+DEBUG 2018-02-15 14:30:42,393: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 82890
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 14:30:42,497: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 82890
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 14:30:42,497: 	 Proxy valid for 23:01:30 hours
+DEBUG 2018-02-15 14:30:42,498: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-02-15 14:39:06,250: 	 Executing command: 'submit'
+DEBUG 2018-02-15 14:39:06,254: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-02-15 14:39:06,260: 	 Checking credentials
+DEBUG 2018-02-15 14:39:06,261: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-02-15 14:39:06,261: 	 Getting proxy life time left
+DEBUG 2018-02-15 14:39:06,363: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 82386
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 14:39:06,467: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 82386
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 14:39:06,467: 	 Proxy valid for 22:53:06 hours
+DEBUG 2018-02-15 14:39:06,468: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-02-15 14:39:35,540: 	 Executing command: 'submit'
+DEBUG 2018-02-15 14:39:35,542: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-02-15 14:39:35,548: 	 Checking credentials
+DEBUG 2018-02-15 14:39:35,548: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-02-15 14:39:35,548: 	 Getting proxy life time left
+DEBUG 2018-02-15 14:39:35,651: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 82357
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 14:39:35,754: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 82357
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 14:39:35,754: 	 Proxy valid for 22:52:37 hours
+DEBUG 2018-02-15 14:39:35,755: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-02-15 14:40:38,847: 	 Executing command: 'submit'
+DEBUG 2018-02-15 14:40:38,851: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-02-15 14:40:38,858: 	 Checking credentials
+DEBUG 2018-02-15 14:40:38,858: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-02-15 14:40:38,858: 	 Getting proxy life time left
+DEBUG 2018-02-15 14:40:38,961: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 82294
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 14:40:39,065: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 82293
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-15 14:40:39,065: 	 Proxy valid for 22:51:34 hours
+DEBUG 2018-02-15 14:40:39,066: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-02-16 11:36:17,233: 	 Executing command: 'submit'
+DEBUG 2018-02-16 11:36:17,235: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-02-16 11:36:17,243: 	 Checking credentials
+DEBUG 2018-02-16 11:36:17,243: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-02-16 11:36:17,243: 	 Getting proxy life time left
+DEBUG 2018-02-16 11:36:17,346: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 6955
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-16 11:36:17,449: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 6955
+
+ error: 
+ retcode : 0
+DEBUG 2018-02-16 11:36:17,449: 	 Proxy valid for 01:55:55 hours
+DEBUG 2018-02-16 11:36:17,450: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-22 17:56:53,335: 	 Executing command: 'submit'
+DEBUG 2018-04-22 17:56:53,337: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-22 17:56:53,345: 	 Checking credentials
+DEBUG 2018-04-22 17:56:53,345: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-22 17:56:53,345: 	 Getting proxy life time left
+DEBUG 2018-04-22 17:56:53,448: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 86388
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-22 17:56:53,551: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 86388
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-22 17:56:53,552: 	 Proxy valid for 23:59:48 hours
+DEBUG 2018-04-22 17:56:53,552: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-22 18:03:20,803: 	 Executing command: 'status'
+DEBUG 2018-04-22 18:03:20,803: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+ERROR 2018-04-22 18:03:20,806: 	 Cannot find .requestcache file in CRAB project directory /home/t3-ku/jaking/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/python/crab_files_20April18/crab_TprimeBToTH_M-1000_Width-10p_LH_TuneCUETP8M2T4_14TeV-madgraph-pythia8
+ERROR 2018-04-22 18:03:20,806: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/bin/crab", line 160, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/status.py", line 39, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 259, in __init__
+    self.validateOptions()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/status.py", line 1017, in validateOptions
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 577, in validateOptions
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 438, in loadLocalCache
+    raise ex
+CachefileNotFoundException: Cannot find .requestcache file in CRAB project directory /home/t3-ku/jaking/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/python/crab_files_20April18/crab_TprimeBToTH_M-1000_Width-10p_LH_TuneCUETP8M2T4_14TeV-madgraph-pythia8
+DEBUG 2018-04-22 19:20:06,715: 	 Executing command: 'status'
+DEBUG 2018-04-22 19:20:06,716: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+ERROR 2018-04-22 19:20:06,718: 	 Cannot find .requestcache file in CRAB project directory /home/t3-ku/jaking/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/python/crab_files_20April18/crab_TprimeBToTH_M-1000_Width-10p_LH_TuneCUETP8M2T4_14TeV-madgraph-pythia8
+ERROR 2018-04-22 19:20:06,718: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/bin/crab", line 160, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/status.py", line 39, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 259, in __init__
+    self.validateOptions()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/status.py", line 1017, in validateOptions
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 577, in validateOptions
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 438, in loadLocalCache
+    raise ex
+CachefileNotFoundException: Cannot find .requestcache file in CRAB project directory /home/t3-ku/jaking/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/python/crab_files_20April18/crab_TprimeBToTH_M-1000_Width-10p_LH_TuneCUETP8M2T4_14TeV-madgraph-pythia8
+DEBUG 2018-04-23 13:10:52,703: 	 Executing command: 'submit'
+DEBUG 2018-04-23 13:10:52,705: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-23 13:10:52,716: 	 Checking credentials
+DEBUG 2018-04-23 13:10:52,717: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-23 13:10:52,717: 	 Getting proxy life time left
+DEBUG 2018-04-23 13:10:52,821: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 17149
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:52,925: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 17149
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:52,925: 	 Proxy valid for 04:45:49 hours
+DEBUG 2018-04-23 13:10:52,926: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-23 13:10:52,928: 	 Executing command: 'submit'
+DEBUG 2018-04-23 13:10:52,928: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-23 13:10:52,934: 	 Checking credentials
+DEBUG 2018-04-23 13:10:52,934: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-23 13:10:52,934: 	 Getting proxy life time left
+DEBUG 2018-04-23 13:10:53,037: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 17149
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:53,140: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 17148
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:53,140: 	 Proxy valid for 04:45:49 hours
+DEBUG 2018-04-23 13:10:53,141: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-23 13:10:53,143: 	 Executing command: 'submit'
+DEBUG 2018-04-23 13:10:53,143: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-23 13:10:53,148: 	 Checking credentials
+DEBUG 2018-04-23 13:10:53,149: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-23 13:10:53,149: 	 Getting proxy life time left
+DEBUG 2018-04-23 13:10:53,252: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 17148
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:53,356: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 17148
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:53,356: 	 Proxy valid for 04:45:48 hours
+DEBUG 2018-04-23 13:10:53,357: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-23 13:10:53,358: 	 Executing command: 'submit'
+DEBUG 2018-04-23 13:10:53,359: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-23 13:10:53,364: 	 Checking credentials
+DEBUG 2018-04-23 13:10:53,364: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-23 13:10:53,364: 	 Getting proxy life time left
+DEBUG 2018-04-23 13:10:53,467: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 17148
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:53,570: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 17148
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:53,570: 	 Proxy valid for 04:45:48 hours
+DEBUG 2018-04-23 13:10:53,571: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-23 13:10:53,573: 	 Executing command: 'submit'
+DEBUG 2018-04-23 13:10:53,573: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-23 13:10:53,579: 	 Checking credentials
+DEBUG 2018-04-23 13:10:53,579: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-23 13:10:53,579: 	 Getting proxy life time left
+DEBUG 2018-04-23 13:10:53,681: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 17148
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:53,785: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 17148
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:53,786: 	 Proxy valid for 04:45:48 hours
+DEBUG 2018-04-23 13:10:53,787: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-23 13:10:53,790: 	 Executing command: 'submit'
+DEBUG 2018-04-23 13:10:53,790: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-23 13:10:53,798: 	 Checking credentials
+DEBUG 2018-04-23 13:10:53,798: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-23 13:10:53,798: 	 Getting proxy life time left
+DEBUG 2018-04-23 13:10:53,902: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 17148
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:54,005: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 17148
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-23 13:10:54,005: 	 Proxy valid for 04:45:48 hours
+DEBUG 2018-04-23 13:10:54,006: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 14:19:04,287: 	 Executing command: 'submit'
+DEBUG 2018-04-25 14:19:04,306: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 14:19:04,332: 	 Checking credentials
+DEBUG 2018-04-25 14:19:04,332: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 14:19:04,332: 	 Getting proxy life time left
+DEBUG 2018-04-25 14:19:04,434: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 0
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:19:04,435: 	 Proxy valid for 00:00:00 hours
+DEBUG 2018-04-25 14:19:04,435: 	 Creating new proxy for 24:00 hours with VO group '' and VO role 'NULL'.
+DEBUG 2018-04-25 14:19:07,845: 	 Executing : 
+ command : voms-proxy-init -voms cms:/cms -valid 24:00 -rfc
+ output : None
+ error: None
+ retcode : 3
+DEBUG 2018-04-25 14:19:08,248: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 0
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:19:08,653: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u4718 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:19:08,777: 	 Executing command: 'submit'
+DEBUG 2018-04-25 14:19:08,942: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 14:19:09,452: 	 Checking credentials
+DEBUG 2018-04-25 14:19:09,453: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 14:19:09,453: 	 Getting proxy life time left
+DEBUG 2018-04-25 14:19:09,855: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 0
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:19:09,856: 	 Proxy valid for 00:00:00 hours
+DEBUG 2018-04-25 14:19:09,856: 	 Creating new proxy for 24:00 hours with VO group '' and VO role 'NULL'.
+DEBUG 2018-04-25 14:19:23,988: 	 Executing : 
+ command : voms-proxy-init -voms cms:/cms -valid 24:00 -rfc
+ output : None
+ error: None
+ retcode : 3
+DEBUG 2018-04-25 14:19:24,091: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 0
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:19:24,194: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u4718 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:19:43,759: 	 Executing command: 'submit'
+DEBUG 2018-04-25 14:19:43,761: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 14:19:43,770: 	 Checking credentials
+DEBUG 2018-04-25 14:19:43,770: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 14:19:43,770: 	 Getting proxy life time left
+DEBUG 2018-04-25 14:19:43,973: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 86387
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:19:44,077: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 86386
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:19:44,077: 	 Proxy valid for 23:59:47 hours
+DEBUG 2018-04-25 14:19:44,078: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 14:20:09,836: 	 Executing command: 'submit'
+DEBUG 2018-04-25 14:20:09,836: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 14:20:09,843: 	 Checking credentials
+DEBUG 2018-04-25 14:20:09,844: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 14:20:09,844: 	 Getting proxy life time left
+DEBUG 2018-04-25 14:20:09,947: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 86361
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:20:10,052: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 86361
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:20:10,052: 	 Proxy valid for 23:59:21 hours
+DEBUG 2018-04-25 14:20:10,053: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 14:20:30,602: 	 Executing command: 'submit'
+DEBUG 2018-04-25 14:20:30,602: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 14:20:30,610: 	 Checking credentials
+DEBUG 2018-04-25 14:20:30,610: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 14:20:30,610: 	 Getting proxy life time left
+DEBUG 2018-04-25 14:20:30,713: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 86340
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:20:30,818: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 86340
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:20:30,818: 	 Proxy valid for 23:59:00 hours
+DEBUG 2018-04-25 14:20:30,819: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 14:21:33,917: 	 Executing command: 'submit'
+DEBUG 2018-04-25 14:21:33,946: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 14:21:34,024: 	 Checking credentials
+DEBUG 2018-04-25 14:21:34,025: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 14:21:34,025: 	 Getting proxy life time left
+DEBUG 2018-04-25 14:21:34,128: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 86276
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:21:34,233: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 86276
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:21:34,234: 	 Proxy valid for 23:57:56 hours
+DEBUG 2018-04-25 14:21:34,235: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 14:23:49,990: 	 Executing command: 'submit'
+DEBUG 2018-04-25 14:23:49,990: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 14:23:49,997: 	 Checking credentials
+DEBUG 2018-04-25 14:23:49,998: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 14:23:49,998: 	 Getting proxy life time left
+DEBUG 2018-04-25 14:23:50,101: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 86140
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:23:50,205: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 86140
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:23:50,206: 	 Proxy valid for 23:55:40 hours
+DEBUG 2018-04-25 14:23:50,207: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 14:26:50,482: 	 Executing command: 'submit'
+DEBUG 2018-04-25 14:26:50,482: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 14:26:50,490: 	 Checking credentials
+DEBUG 2018-04-25 14:26:50,490: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 14:26:50,490: 	 Getting proxy life time left
+DEBUG 2018-04-25 14:26:50,594: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 85960
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:26:50,699: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 85960
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:26:50,699: 	 Proxy valid for 23:52:40 hours
+DEBUG 2018-04-25 14:26:50,700: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 14:26:50,703: 	 Executing command: 'submit'
+DEBUG 2018-04-25 14:26:50,704: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 14:26:50,710: 	 Checking credentials
+DEBUG 2018-04-25 14:26:50,711: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 14:26:50,711: 	 Getting proxy life time left
+DEBUG 2018-04-25 14:26:50,814: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 85960
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:26:50,919: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 85960
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 14:26:50,920: 	 Proxy valid for 23:52:40 hours
+DEBUG 2018-04-25 14:26:50,921: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 14:28:35,975: 	 Executing command: 'kill'
+DEBUG 2018-04-25 14:28:35,976: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+ERROR 2018-04-25 14:28:35,978: 	 Cannot find .requestcache file in CRAB project directory /home/t3-ku/jaking/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/python/crab_files2_23April18/crab_ST_tW_DR_14TeV_antitop_incl-powheg-pythia8
+ERROR 2018-04-25 14:28:35,978: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/bin/crab", line 160, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 259, in __init__
+    self.validateOptions()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/kill.py", line 63, in validateOptions
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 577, in validateOptions
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 438, in loadLocalCache
+    raise ex
+CachefileNotFoundException: Cannot find .requestcache file in CRAB project directory /home/t3-ku/jaking/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/python/crab_files2_23April18/crab_ST_tW_DR_14TeV_antitop_incl-powheg-pythia8
+DEBUG 2018-04-25 14:35:02,912: 	 Executing command: 'status'
+DEBUG 2018-04-25 14:35:02,941: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+ERROR 2018-04-25 14:35:03,069: 	 Cannot find .requestcache file in CRAB project directory /home/t3-ku/jaking/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/python/crab_files2_23April18/crab_ST_tW_DR_14TeV_antitop_incl-powheg-pythia8
+ERROR 2018-04-25 14:35:03,070: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/bin/crab", line 160, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/status.py", line 39, in __init__
+    SubCommand.__init__(self, logger, cmdargs)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 259, in __init__
+    self.validateOptions()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/status.py", line 1017, in validateOptions
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 577, in validateOptions
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 438, in loadLocalCache
+    raise ex
+CachefileNotFoundException: Cannot find .requestcache file in CRAB project directory /home/t3-ku/jaking/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/python/crab_files2_23April18/crab_ST_tW_DR_14TeV_antitop_incl-powheg-pythia8
+DEBUG 2018-04-25 14:40:43,837: 	 Executing command: 'kill'
+DEBUG 2018-04-25 14:40:43,838: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+ERROR 2018-04-25 14:40:43,840: 	 Cannot find .requestcache file in CRAB project directory /home/t3-ku/jaking/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/python/crab_files2_23April18/crab_ST_tW_DR_14TeV_antitop_incl-powheg-pythia8
+ERROR 2018-04-25 14:40:43,840: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/bin/crab", line 160, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 259, in __init__
+    self.validateOptions()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/kill.py", line 63, in validateOptions
+    SubCommand.validateOptions(self)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 577, in validateOptions
+    self.loadLocalCache()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1804.patch1/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 438, in loadLocalCache
+    raise ex
+CachefileNotFoundException: Cannot find .requestcache file in CRAB project directory /home/t3-ku/jaking/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/python/crab_files2_23April18/crab_ST_tW_DR_14TeV_antitop_incl-powheg-pythia8
+DEBUG 2018-04-25 15:32:39,713: 	 Executing command: 'submit'
+DEBUG 2018-04-25 15:32:39,715: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 15:32:39,735: 	 Checking credentials
+DEBUG 2018-04-25 15:32:39,736: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 15:32:39,736: 	 Getting proxy life time left
+DEBUG 2018-04-25 15:32:39,938: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 82011
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:40,042: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 82011
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:40,042: 	 Proxy valid for 22:46:51 hours
+DEBUG 2018-04-25 15:32:40,043: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 15:32:40,163: 	 Executing command: 'submit'
+DEBUG 2018-04-25 15:32:40,163: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 15:32:40,170: 	 Checking credentials
+DEBUG 2018-04-25 15:32:40,170: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 15:32:40,170: 	 Getting proxy life time left
+DEBUG 2018-04-25 15:32:40,273: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 82010
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:40,377: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 82010
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:40,377: 	 Proxy valid for 22:46:50 hours
+DEBUG 2018-04-25 15:32:40,378: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 15:32:40,381: 	 Executing command: 'submit'
+DEBUG 2018-04-25 15:32:40,381: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 15:32:40,387: 	 Checking credentials
+DEBUG 2018-04-25 15:32:40,388: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 15:32:40,388: 	 Getting proxy life time left
+DEBUG 2018-04-25 15:32:40,491: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 82010
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:40,595: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 82010
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:40,595: 	 Proxy valid for 22:46:50 hours
+DEBUG 2018-04-25 15:32:40,596: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 15:32:40,754: 	 Executing command: 'submit'
+DEBUG 2018-04-25 15:32:40,754: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 15:32:40,760: 	 Checking credentials
+DEBUG 2018-04-25 15:32:40,761: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 15:32:40,761: 	 Getting proxy life time left
+DEBUG 2018-04-25 15:32:40,864: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 82010
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:40,968: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 82010
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:40,968: 	 Proxy valid for 22:46:50 hours
+DEBUG 2018-04-25 15:32:40,970: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 15:32:40,972: 	 Executing command: 'submit'
+DEBUG 2018-04-25 15:32:40,973: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 15:32:40,978: 	 Checking credentials
+DEBUG 2018-04-25 15:32:40,978: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 15:32:40,978: 	 Getting proxy life time left
+DEBUG 2018-04-25 15:32:41,081: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 82009
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:41,185: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 82009
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:41,185: 	 Proxy valid for 22:46:49 hours
+DEBUG 2018-04-25 15:32:41,186: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2018-04-25 15:32:41,204: 	 Executing command: 'submit'
+DEBUG 2018-04-25 15:32:41,204: 	 Found CRAB cache file /home/t3-ku/jaking/.crab3
+DEBUG 2018-04-25 15:32:41,210: 	 Checking credentials
+DEBUG 2018-04-25 15:32:41,210: 	 Found proxy file /tmp/x509up_u4718
+DEBUG 2018-04-25 15:32:41,210: 	 Getting proxy life time left
+DEBUG 2018-04-25 15:32:41,313: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -timeleft
+ output : 82009
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:41,416: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u4718 -actimeleft
+ output : 82009
+
+ error: 
+ retcode : 0
+DEBUG 2018-04-25 15:32:41,417: 	 Proxy valid for 22:46:49 hours
+DEBUG 2018-04-25 15:32:41,418: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
