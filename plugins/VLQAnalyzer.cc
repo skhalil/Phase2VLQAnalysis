@@ -95,8 +95,8 @@ private:
    virtual void endRun(edm::Run const&, edm::EventSetup const&); //override;
    virtual void endJob() override;
    
-   bool isME0MuonSelNew(const reco::Muon&, double, double, double, edm::EventSetup const& ); //copy paste from Jan & Maria
-
+   bool isME0MuonSelNew(const reco::Muon&, double, double, double, edm::EventSetup const& ); //copy paste from Jan & Maria 
+  
    // ----------member data ---------------------------
    edm::EDGetTokenT<std::vector<pat::PackedGenParticle>> genPartsToken_;
    edm::EDGetTokenT<GenEventInfoProduct>         genToken_;
@@ -114,6 +114,7 @@ private:
    edm::EDGetTokenT<std::vector<reco::GenJet>>   genJetsToken_;
 
    const ME0Geometry* ME0Geometry_; 
+   bool usePuppi_;
    float ak4ptmin_, ak4etamax_, ak8ptmin_, ak8etamax_;
 
    edm::Service<TFileService> fs_;
@@ -139,7 +140,7 @@ private:
 //
 // constructors and destructor
 //
-VLQAnalyzer::VLQAnalyzer(const edm::ParameterSet& iConfig):
+VLQAnalyzer::VLQAnalyzer(const edm::ParameterSet& iConfig):   
    genPartsToken_  (consumes<std::vector<pat::PackedGenParticle>>(iConfig.getParameter<edm::InputTag>("genParts"))),
    genToken_       (consumes<GenEventInfoProduct>(edm::InputTag("generator"))),
    genlheToken_    (consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer",""))),
@@ -154,6 +155,7 @@ VLQAnalyzer::VLQAnalyzer(const edm::ParameterSet& iConfig):
    ak8jetsToken_   (consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jets_ak8"))),
    subak8jetsToken_(consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("subjets_ak8"))),
    genJetsToken_   (consumes<std::vector<reco::GenJet>>(iConfig.getParameter<edm::InputTag>("genJets"))),
+   usePuppi_       (iConfig.getParameter<bool>("usePuppi")),
    ak4ptmin_       (iConfig.getParameter<double>("ak4ptmin")),
    ak4etamax_      (iConfig.getParameter<double>("ak4etamax")),
    ak8ptmin_       (iConfig.getParameter<double>("ak8ptmin")),
@@ -268,7 +270,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    edm::Handle<std::vector<pat::Electron>> elecs;
    iEvent.getByToken(elecsToken_, elecs);
     
-   ele_.nLoose=0; ele_.nMedium=0.; ele_.nTight=0.;
+   //ele_.nLoose=0; ele_.nMedium=0.; ele_.nTight=0.;
    for (const pat::Electron & i : *elecs) {
       if (i.pt() < 20.) continue;
       if (fabs(i.eta()) > 4.) continue;
@@ -319,10 +321,10 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       int eleType = 1*isLoose + 2*isMedium + 4*isTight;
       ele_.eleWP.   push_back(eleType);
       
-      if ( (eleType & 1) == 1) {ele_.nLoose++ ;}
-      if ( (eleType & 2) == 2) {ele_.nMedium++ ;}
-      if ( (eleType & 4) == 4) {ele_.nTight++ ;}
-     
+      //if ( (eleType & 1) == 1) {ele_.nLoose++ ;}
+      //if ( (eleType & 2) == 2) {ele_.nMedium++ ;}
+      //if ( (eleType & 4) == 4) {ele_.nTight++ ;}
+          
       ele_.pt.     push_back(i.pt()) ;
       ele_.eta.    push_back(i.eta());
       ele_.phi.    push_back(i.phi());
@@ -336,22 +338,16 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
 
    //Muons
+   // muon isolation comes from https://twiki.cern.ch/twiki/bin/viewauth/CMS/Phase2MuonBarrelRecipes#Muon_isolation
+   // muon ID comes from https://twiki.cern.ch/twiki/bin/viewauth/CMS/Phase2MuonBarrelRecipes#Muon_identification
    Handle<std::vector<pat::Muon>> mus;
    iEvent.getByToken(muonsToken_, mus);
-
-   mu_.nLoose=0; mu_.nMedium=0.; mu_.nTight=0.;
+   
+   //mu_.nLoose=0; mu_.nMedium=0.; mu_.nTight=0.;
    for (const pat::Muon & i : *mus) {
       if (i.pt() < 20.) continue;
       if (fabs(i.eta()) > 4.) continue;
-      //Loose
-      //bool isLoose (0), isMedium (0), isTight (0);
-      double dPhiCut = std::min(std::max(1.2/i.p(),1.2/100),0.056);
-      double dPhiBendCut = std::min(std::max(0.2/i.p(),0.2/100),0.0096); 
       
-      bool isLoose = (fabs(i.eta()) < 2.4 && muon::isLooseMuon(i)) || (fabs(i.eta()) > 2.4 && 
-                      isME0MuonSelNew(i, 0.077, dPhiCut, dPhiBendCut,iSetup));
-      //std::cout << "isLoose : " << isLoose << std::endl;
-      // Medium ID -- needs to be updated
       bool ipxy = false, ipz = false, validPxlHit = false, highPurity = false;
       float dz=0, dxy=0;
       if (i.innerTrack().isNonnull()){
@@ -362,11 +358,35 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          validPxlHit = i.innerTrack()->hitPattern().numberOfValidPixelHits() > 0;
          highPurity = i.innerTrack()->quality(reco::Track::highPurity);
       } 
-      bool isMedium = (fabs(i.eta()) < 2.4 && muon::isMediumMuon(i)) || (fabs(i.eta()) > 2.4 && 
-                       isME0MuonSelNew(i, 0.077, dPhiCut, dPhiBendCut, iSetup) && ipxy && ipz && validPxlHit && highPurity);
+      float iso = i.trackIso(); 
 
+      //Loose
+      double dPhiCut = std::min(std::max(1.2/i.p(),1.2/100),0.056);
+      double dPhiBendCut = std::min(std::max(0.2/i.p(),0.2/100),0.0096);       
+      bool isLoose = (fabs(i.eta()) < 2.4 && muon::isLooseMuon(i)) || 
+         (fabs(i.eta()) > 2.4 && isME0MuonSelNew(i, 0.077, dPhiCut, dPhiBendCut,iSetup));
       
-
+      // Medium ID -- needs to be updated
+      bool isMedium = (fabs(i.eta()) < 2.4 && muon::isMediumMuon(i)) || 
+         (fabs(i.eta()) > 2.4 && isME0MuonSelNew(i, 0.077, dPhiCut, dPhiBendCut, iSetup) && ipxy && ipz && validPxlHit && highPurity);
+      
+      // Tight ID
+      dPhiCut = std::min(std::max(1.2/i.p(),1.2/100),0.032);
+      dPhiBendCut = std::min(std::max(0.2/i.p(),0.2/100),0.0041);
+      bool isTight = (fabs(i.eta()) < 2.4 && vertices->size() > 0 && muon::isTightMuon(i,vertices->at(prVtx))) || 
+         (fabs(i.eta()) > 2.4 && isME0MuonSelNew(i, 0.048, dPhiCut, dPhiBendCut,iSetup) && ipxy && ipz && validPxlHit && highPurity);
+      
+      //
+      int muType = 1*isLoose + 2*isMedium + 4*isTight;
+      mu_.muWP.   push_back(muType);
+      mu_.charge. push_back(i.charge());
+      mu_.pt.     push_back(i.pt());
+      mu_.phi.    push_back(i.phi());
+      mu_.eta.    push_back(i.eta());
+      mu_.mass.   push_back(i.mass());
+      mu_.dxy.    push_back(dxy);
+      mu_.dz.     push_back(dz);
+      mu_.relIso. push_back(iso/i.pt());
    }
 
    //Gen Jets
@@ -419,9 +439,11 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       ak4jet_.csvv2        .push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
       ak4jet_.deepcsv      .push_back(j.bDiscriminator("pfDeepCSVJetTags:probb") 
                                        + j.bDiscriminator("pfDeepCSVJetTags:probbb"));
-      ak4jet_.pujetid      .push_back(j.userFloat("pileupJetId:fullDiscriminant")); 
+      if (!usePuppi_){
+         ak4jet_.pujetid   .push_back(j.userFloat("pileupJetId:fullDiscriminant")); 
+      }
    } 
-     
+   
    edm::Handle<edm::View<pat::Jet> > ak8jets;
    iEvent.getByToken(ak8jetsToken_, ak8jets);
    for (const pat::Jet & j : *ak8jets) {

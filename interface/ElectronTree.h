@@ -5,7 +5,7 @@
 
 class ElectronTree {
 public:
-   int nLoose, nMedium, nTight;
+   //int nLoose, nMedium, nTight;
    std::vector<int>   eleWP;
    std::vector<float> pt; 
    std::vector<float> eta;
@@ -33,9 +33,9 @@ public:
    }
 
    void RegisterTree(TTree* tree, std::string name="Electrons") {
-      tree->Branch((name+"_nLoose") .c_str(), &nLoose);
-      tree->Branch((name+"_nMedium").c_str(), &nMedium);   
-      tree->Branch((name+"_nTight") .c_str(), &nTight);
+      //tree->Branch((name+"_nLoose") .c_str(), &nLoose);
+      //tree->Branch((name+"_nMedium").c_str(), &nMedium);   
+      //tree->Branch((name+"_nTight") .c_str(), &nTight);
       tree->Branch((name+"_eleWP")  .c_str(), &eleWP);
       tree->Branch((name+"_pt")     .c_str(), &pt);
       tree->Branch((name+"_eta")    .c_str(), &eta); 

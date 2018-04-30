@@ -38,11 +38,17 @@ maxEvts = options.maxEvts
 # This assumes that the input and output files are in 
 # different directories, otherwise the input will be overwritten 
 # by the output directory name
-fout = TFile(options.files.rstrip().replace('txt', 'root'), 'RECREATE')
+fout = TFile(options.files.rstrip().replace('.txt', '_out.root'), 'RECREATE')
 fout.cd()
 
 hCutflow = TH1D("hCutflow" ,";;Events;" ,10 ,0.5 ,10.5 )
-hCutflow.GetXaxis().SetBinLabel(1 ,"All evts") ; 
+hCutflow.GetXaxis().SetBinLabel(1 ,"All evts") ;
+hCutflow.GetXaxis().SetBinLabel(2 ,"good PV") ;
+hCutflow.GetXaxis().SetBinLabel(3 ,"== 1 lepton") ;
+
+ 
+hlepPt  = TH1D("hlepPt" ,";;Lepton p_{T}(GeV);" ,50 ,0 ,300  )
+hlepEta = TH1D("hlepEta" ,";;Lepton #eta;" ,80 ,-4 ,4  )
 
 # Open the input ntuples
 fnames = [line.strip() for line in open(options.files, 'r')]
@@ -51,7 +57,7 @@ fnames = [line.strip() for line in open(options.files, 'r')]
 ievt = 0
 for fname in fnames:
   if maxEvts > 0 and ievt > maxEvts: break
-  if ievt%100 == 0: print " Processing evt %i" % ievt
+  #if ievt%100 == 0: print " Processing evt %i" % ievt
 
   print 'Opening file %s' % fname
   f = TFile.Open(fname)
@@ -70,31 +76,39 @@ for fname in fnames:
     # call the Gen weights
     evtwt = t.GenEvt_genWt
     hCutflow.Fill(1, evtwt)
-
+    
     # require at least one good primary vertix
     vertices = t.SelectedEvt_nGoodVtx
-    if vertices == 0: continue
-    hCutflow.Fill(2, evtwt)
-
+    if vertices > 0: hCutflow.Fill(2, evtwt)
+    else: continue
+    
   # require exactly one medium WP electron or muon in event
 
 
   # loop on electrons, selecting medium WP electrons
-    nmedium=0
+    nMedium=0
+    ele_eta = t.Electons_eta
+    ele_pt = t.Electons_pt
+
     for i in range(0, len(t.Electons_pt)):
-      eWP = t.Electons_eleWP[i]
-      print 'eWP =', eWP
-      # choose the medium WP: 1 = loose, 2 = medium, 4 = tight
+      # choose the WP: 1 = loose, 2 = medium, 4 = tight
+      eWP = t.Electons_eleWP[i]    
       if (eWP & 2) != 2: continue
-      nmedium += 1
+      # basic kinematics
+      if ele_pt[i] < 20: continue 
+      if abs(ele_eta[i]) < 2.8: continue
+      hlepPt.Fill(ele_pt[i])
+      hlepEta.Fill(ele_eta[i])
+      nMedium += 1
        
-      #if (eWP & 1) == 1 : loose_ele = 1 
-      #if (eWP & 2) == 2 : medium_ele = 1
-      #if (eWP & 4) == 4 : tight_ele = 1
-      
-      #print 'loose = ', loose_ele, 'medium = ', medium_ele, 'tight = ', tight_ele
-    #if not tight_ele: 
+    # require exactly one lepton
     
-    nET = t.Electons_nMedium
-    print 'nMedium = ', ntight, 'nMedium = ', nET
+    if nMedium == 1: 
+      hCutflow.Fill(3, evtwt) 
+    else: continue 
+    
+    
     #print ievt
+    
+fout.Write()
+fout.Close()

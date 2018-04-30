@@ -5,7 +5,7 @@
 
 class MuonTree {
 public:
-   int nLoose, nMedium, nTight;
+   //int nLoose, nMedium, nTight;
    std::vector<int>   muWP;   
    std::vector<float> pt; 
    std::vector<float> eta;
@@ -33,9 +33,9 @@ public:
    }
 
    void RegisterTree(TTree* tree, std::string name="Muons") {
-      tree->Branch((name+"_nLoose") .c_str(), &nLoose);
-      tree->Branch((name+"_nMedium").c_str(), &nMedium);   
-      tree->Branch((name+"_nTight") .c_str(), &nTight);
+      //tree->Branch((name+"_nLoose") .c_str(), &nLoose);
+      //tree->Branch((name+"_nMedium").c_str(), &nMedium);   
+      //tree->Branch((name+"_nTight") .c_str(), &nTight);
       tree->Branch((name+"_muWP")   .c_str(), &muWP);
       tree->Branch((name+"_pt")     .c_str(), &pt);
       tree->Branch((name+"_eta")    .c_str(), &eta); 
