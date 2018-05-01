@@ -22,7 +22,7 @@ if "background" in batch:
 config = config()
 
 config.section_('General')
-config.General.requestName = 'VLQAna_Upgrade'
+config.General.requestName = None
 config.General.transferOutputs = True
 config.General.transferLogs = True
 config.General.workArea = batch
@@ -32,8 +32,8 @@ config.JobType.psetName = PPNdir+'test/VLQAnalyzer_cfg.py'
 config.JobType.pluginName = 'Analysis'
 config.JobType.maxJobRuntimeMin = 2000
 config.JobType.maxMemoryMB = 2500
-config.JobType.allowUndistributedCMSSW = True
-config.JobType.disableAutomaticOutputCollection = True
+#config.JobType.allowUndistributedCMSSW = True
+#config.JobType.disableAutomaticOutputCollection = True
 
 config.section_('Data')
 config.Data.inputDataset = None
@@ -43,7 +43,7 @@ config.Data.splitting = filesplit
 config.Data.unitsPerJob = units
 config.Data.outLFNDirBase = '/store/group/lpcbprime/noreplica/skhalil/Upgrade'
 config.Data.allowNonValidInputDataset = True
-config.Data.ignoreLocality = False
+#config.Data.ignoreLocality = False
 config.Data.publication = False
 
 config.section_('Site')
@@ -65,17 +65,19 @@ for ijob in jobsLines :
     print 's: ', s
     cdi = s + 'MINIAODSIM'
     cgr = s.split('/')[1]
+    if 'ext1' in s: cgr_v1 = cgr+'_ext1' 
+    else: cgr_v1 = cgr 
     r = s.replace("MiniAOD","DR" )
     cds = r + 'GEN-SIM-RECO'
-    if 'TT' in cgr:
+    if 'TT' in cgr and 'v3' in cgr:
             cds_v1 = cds.replace("v3", "v1")
     else:   cds_v1 = cds
     config.Data.inputDataset = cdi
-    config.General.requestName = cgr
+    config.General.requestName = cgr_v1
     config.Data.secondaryInputDataset = cds_v1
     print "Submitting to Crab:"
     print "Inputdataset: ",cdi
-    print "requestName: ",cgr
+    print "requestName: ",cgr_v1
     print "SecondaryInputdataset: ",cds_v1
     print 
     submit(config)

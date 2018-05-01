@@ -212,10 +212,15 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //LHE weight
    edm::Handle<LHEEventProduct> lheInfo;
    iEvent.getByToken(genlheToken_, lheInfo);
-
+   
    if(lheInfo.isValid()) {
-      double asdd = lheInfo->weights()[0].wgt;
       int size = lheInfo->weights().size();
+      double asdd = 1.;
+      if (size != 0){
+         //asdd = lheInfo->weights()[0].wgt;
+      asdd = lheInfo->originalXWGTUP();
+      }
+     
       genevt_.lheWtIDs.reserve(size);
       genevt_.lheWts.reserve(size);
       for(unsigned int i=0; i<lheInfo->weights().size(); ++i) {         
@@ -269,8 +274,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //Electrons
    edm::Handle<std::vector<pat::Electron>> elecs;
    iEvent.getByToken(elecsToken_, elecs);
-    
-   //ele_.nLoose=0; ele_.nMedium=0.; ele_.nTight=0.;
+   
    for (const pat::Electron & i : *elecs) {
       if (i.pt() < 20.) continue;
       if (fabs(i.eta()) > 4.) continue;
@@ -319,12 +323,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       if (!isLoose) continue;
       
       int eleType = 1*isLoose + 2*isMedium + 4*isTight;
-      ele_.eleWP.   push_back(eleType);
-      
-      //if ( (eleType & 1) == 1) {ele_.nLoose++ ;}
-      //if ( (eleType & 2) == 2) {ele_.nMedium++ ;}
-      //if ( (eleType & 4) == 4) {ele_.nTight++ ;}
-          
+      ele_.eleWP.  push_back(eleType);
       ele_.pt.     push_back(i.pt()) ;
       ele_.eta.    push_back(i.eta());
       ele_.phi.    push_back(i.phi());
@@ -343,7 +342,6 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<std::vector<pat::Muon>> mus;
    iEvent.getByToken(muonsToken_, mus);
    
-   //mu_.nLoose=0; mu_.nMedium=0.; mu_.nTight=0.;
    for (const pat::Muon & i : *mus) {
       if (i.pt() < 20.) continue;
       if (fabs(i.eta()) > 4.) continue;
@@ -388,7 +386,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       mu_.dz.     push_back(dz);
       mu_.relIso. push_back(iso/i.pt());
    }
-
+   
    //Gen Jets
    std::vector<reco::GenJet> cleanGenJets;
    
