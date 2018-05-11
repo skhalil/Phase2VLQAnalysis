@@ -1,1 +1,1 @@
-/uscms_data/d2/skhalil/VLQUpgrade/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/test/inputFiles/TbtH_M-1000_W10p_LH.root
+/uscms_data/d2/skhalil/VLQUpgrade/CMSSW_9_3_2/src/Upgrades/VLQAnalyzer/test/test.root

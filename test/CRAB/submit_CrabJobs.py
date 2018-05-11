@@ -30,8 +30,8 @@ config.General.workArea = batch
 config.section_('JobType')
 config.JobType.psetName = PPNdir+'test/VLQAnalyzer_cfg.py'
 config.JobType.pluginName = 'Analysis'
-config.JobType.maxJobRuntimeMin = 2000
-config.JobType.maxMemoryMB = 2500
+config.JobType.maxJobRuntimeMin = 2500#2000
+config.JobType.maxMemoryMB = 4000 #2500
 #config.JobType.allowUndistributedCMSSW = True
 #config.JobType.disableAutomaticOutputCollection = True
 

@@ -194,9 +194,10 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    ak8jet_.clearTreeVectors();
 
    // Basic event info
-   evt_.runno = iEvent.eventAuxiliary().run();
+   //evt_.runno = iEvent.eventAuxiliary().run();
    evt_.lumisec = iEvent.eventAuxiliary().luminosityBlock();
    evt_.evtno = iEvent.eventAuxiliary().event();
+   evt_.countEvents = 1.;//test
 
    //Generator weights
    float genwt = 1.0;
@@ -218,7 +219,7 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       double asdd = 1.;
       if (size != 0){
          //asdd = lheInfo->weights()[0].wgt;
-      asdd = lheInfo->originalXWGTUP();
+         asdd = lheInfo->originalXWGTUP();
       }
      
       genevt_.lheWtIDs.reserve(size);
@@ -252,9 +253,15 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    int prVtx = -1;
    for (size_t i = 0; i < vertices->size(); i++) {
       if (vertices->at(i).isFake()) continue;
-      if (vertices->at(i).ndof() <= 4) continue; 
-      prVtx = i;  
-      evt_.vPt2.push_back(vertices->at(i).p4().pt());
+      if (vertices->at(i).ndof() <= 4) continue;
+       
+      //add rho, Z
+      if (prVtx < 0) {prVtx = i; }
+      evt_.ndofVtx.push_back(vertices->at(i).ndof());
+      evt_.chi2Vtx.push_back(vertices->at(i).chi2());
+      evt_.zVtx.push_back(vertices->at(i).position().z());
+      evt_.rhoVtx.push_back(vertices->at(i).position().rho());
+      evt_.ptVtx.push_back(vertices->at(i).p4().pt());
       evt_.nGoodVtx++;
    }
    auto primaryVertex=vertices->at(prVtx);
@@ -262,15 +269,16 @@ VLQAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    // MET
    edm::Handle<std::vector<pat::MET>> mets;
    iEvent.getByToken(metsToken_, mets);
-   met_.px=0.;  met_.py=0.; met_.pt=0.; met_.eta=0.; met_.phi=0.;
+   met_.px=0.;  met_.py=0.; met_.pz=0; met_.et=0; met_.pt=0.; met_.phi=0.;
    if (mets->size() != 0 ){
          met_.px = mets->at(0).px();
          met_.py = mets->at(0).py();
+         met_.pz = mets->at(0).pz();
+         met_.et = mets->at(0).et();
          met_.pt = mets->at(0).pt();
-         met_.eta = mets->at(0).eta();
          met_.phi = mets->at(0).phi();
       }
-
+   
    //Electrons
    edm::Handle<std::vector<pat::Electron>> elecs;
    iEvent.getByToken(elecsToken_, elecs);
@@ -578,7 +586,8 @@ VLQAnalyzer::beginJob()
   tree_ = fs_->make<TTree>("anatree", "anatree") ;
   evt_.RegisterTree(tree_, "SelectedEvt") ;
   genevt_.RegisterTree(tree_, "GenEvt") ;
-  ele_.RegisterTree(tree_, "Electons") ;
+  ele_.RegisterTree(tree_, "Electrons") ;
+  mu_.RegisterTree(tree_, "Muons");
   met_.RegisterTree(tree_, "MET");
   ak4jet_.RegisterTree(tree_, "AK4JetsCHS") ; 
   ak8jet_.RegisterTree(tree_, "AK8Jets") ; 

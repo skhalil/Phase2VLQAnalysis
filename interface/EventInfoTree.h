@@ -5,7 +5,8 @@
 
 class EventInfoTree {
   public:
-    int    runno ;
+    int    countEvents ;
+   //int    runno ;
     int    lumisec ;
     int    evtno;
     int    npv;   
@@ -13,14 +14,23 @@ class EventInfoTree {
     int    puBX;
     int    npuInt;
     int    nGoodVtx;
-    std::vector<float> vPt2;
+    std::vector<int>   ndofVtx;
+    std::vector<float> chi2Vtx;
+    std::vector<float> zVtx;
+    std::vector<float> rhoVtx;
+    std::vector<float> ptVtx;
 
     void clearTreeVectors() {
-         vPt2.clear();
+       ndofVtx.clear();
+       chi2Vtx.clear();
+       zVtx.clear();
+       rhoVtx.clear();
+       ptVtx.clear();
     }
 
     void RegisterTree(TTree* tree, std::string name="SelectedEvents") {
-      tree->Branch((name+"_runno").c_str(), &runno, (name+"_runno/I").c_str());
+      tree->Branch((name+"_countEvents").c_str(), &countEvents, (name+"_countEvents/I").c_str());
+      //tree->Branch((name+"_runno").c_str(), &runno, (name+"_runno/I").c_str());
       tree->Branch((name+"_lumisec").c_str(), &lumisec, (name+"_lumisec/I").c_str());
       tree->Branch((name+"_evtno").c_str(), &evtno, (name+"_evtno/I").c_str());
       tree->Branch((name+"_npv").c_str(), &npv, "npv/I");
@@ -28,7 +38,11 @@ class EventInfoTree {
       tree->Branch((name+"_puBX").c_str(), &puBX, "puBX/I");
       tree->Branch((name+"_npuInt").c_str(), &npuInt, "npuInt/I");      
       tree->Branch((name+"_nGoodVtx").c_str(), &nGoodVtx, (name+"_nGoodVtx/I").c_str());
-      tree->Branch((name+"_vPt2").c_str(), &vPt2, (name+"_vPt2/F").c_str());
+      tree->Branch((name+"_ndofVtx").c_str(), &ndofVtx, (name+"_ndofVtx/I").c_str());
+      tree->Branch((name+"_chi2Vtx").c_str(), &chi2Vtx, (name+"_chi2Vtx/F").c_str());
+      tree->Branch((name+"_zVtx").c_str(), &zVtx, (name+"_zVtx/F").c_str());
+      tree->Branch((name+"_rhoVtx").c_str(), &rhoVtx, (name+"_rhoVtx/F").c_str()); 
+      tree->Branch((name+"_ptVtx").c_str(), &ptVtx, (name+"_ptVtx/F").c_str());
     }
 };
 
