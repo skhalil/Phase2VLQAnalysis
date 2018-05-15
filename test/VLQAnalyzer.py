@@ -132,20 +132,43 @@ for fname in fnames:
       eWP = t.Electrons_eleWP[i]    
       if (eWP & 1) != 1: continue
       if ele_pt[i] < 40.: continue 
-      if abs(ele_eta[i]) < 2.8: continue
+      if abs(ele_eta[i]) > 2.8: continue
       nMedium += 1
       #print 'mva = ',  ele_mva[i], 'eta = ', abs(ele_eta[i]), 'pt = ', ele_pt[i], 'eWP = ', eWP 
 
+  # loop on muons, selecting medium WP muons
+    nmuMedium=0
+    mu_eta = t.Muons_eta
+    mu_phi = t.Muons_phi
+    mu_pt  = t.Muons_pt
+    mu_m   = t.Muons_mass
+    mu_iso = t.Muons_relIso
+    #print 'size of muons :' , len(t.Muons_pt)
+    for i in range(0, len(t.Muons_pt)):
+      # choose the WP: 1 = loose, 2 = medium, 4 = tight
+      muWP = t.Muons_muWP[i]
+      if (muWP & 1) != 1: continue
+      if mu_pt[i] < 40.: continue
+      if abs(mu_eta[i]) > 4.0: continue
+      nmuMedium += 1
+      #print 'mva = ',  mu_mva[i], 'eta = ', abs(mu_eta[i]), 'pt = ', mu_pt[i], 'muWP = ', muWP 
+
     #require exactly one lepton   
-    if nMedium != 1: continue 
+    if nMedium + nmuMedium != 1: continue 
     ncut += 1
     hCutflow.Fill(ncut, evtwt)
     
     # store lep variables:
-    hlepPt.Fill(ele_pt[0], evtwt)
-    hlepEta.Fill(ele_eta[0], evtwt)
-    hlepIso.Fill(ele_iso[0], evtwt) 
-    lepP4.SetPtEtaPhiM(ele_pt[0], ele_eta[0], ele_phi[0], ele_m[0])
+    if len(ele_pt) > 0:
+    	hlepPt.Fill(ele_pt[0], evtwt)
+    	hlepEta.Fill(ele_eta[0], evtwt)
+    	hlepIso.Fill(ele_iso[0], evtwt) 
+    	lepP4.SetPtEtaPhiM(ele_pt[0], ele_eta[0], ele_phi[0], ele_m[0])
+    else:
+	hlepPt.Fill(mu_pt[0], evtwt)
+        hlepEta.Fill(mu_eta[0], evtwt)
+        hlepIso.Fill(mu_iso[0], evtwt)
+        lepP4.SetPtEtaPhiM(mu_pt[0], mu_eta[0], mu_phi[0], mu_m[0])
     lep_p3 = lepP4.Vect();
 
     # loop over jets 
@@ -201,8 +224,11 @@ for fname in fnames:
     ncut += 1
     hCutflow.Fill(ncut, evtwt)
     # separate the jets into central and forward jet collections  
-    
-    hlepIso_sig.Fill(ele_iso[0], evtwt) 
+
+    if len(ele_iso) > 0:
+    	hlepIso_sig.Fill(ele_iso[0], evtwt)
+    else:
+	hlepIso_sig.Fill(mu_iso[0], evtwt) 
       
     del jetsP4[:] 
     #print ievt
