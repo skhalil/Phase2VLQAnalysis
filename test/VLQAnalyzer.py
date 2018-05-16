@@ -76,10 +76,16 @@ hDPtRel    = TH1D("hDPtRel", "#Delta p_{T}^{REL}; #Delta p_{T}^{REL} (GeV); Even
 hDelPtRel  = TH1D("hDelPtRel", "#Delta p_{T}^{REL}; #Delta p_{T}^{REL} [GeV]; Events/20 GeV;", 50, 0, 100) 
 h2DdPtReldR = TH2D("h2DdPtReldR", ";#Delta R(l,j); #Delta p_{T}^{REL} [GeV]", 50, 0.0, 1.0, 20, 0., 200.)
 h2DdPtRelDRMin = TH2D("h2DdPtRelDRMin", ";#Delta R_{MIN}(l,j); min #Delta p_{T}^{REL} (GeV)", 50, 0.0, 1.0, 20, 0., 200.)
-h2DPtRelDRMin = TH2D("h2DPtRelDRMin",";#Delta R_{MIN}(l,j); p_{T,rel} (GeV)", 50, 0.0, 1.0, 20, 0., 200.) 
+h2DPtRelDRMin = TH2D("h2DPtRelDRMin", ";#Delta R_{MIN}(l,j); p_{T,rel} (GeV)", 50, 0.0, 1.0, 20, 0., 200.) 
+hNForwardJets = TH1D("hNForwardJets", "Number of Forward Jets; Number of Forward Jets; Events;", 40, 0, 40)
+hLeadingJetPt = TH1D("hLeadingJetPt", "Leading Jet p_{T}; p_{T} {GeV}; Events;", 50, 0, 1000)
+hLeadingJetEta = TH1D("hLeadingJetEta", "Leading Jet #eta; #eta; Events;", 80, -4.0, 4.0)
+hNCentJets = TH1D("hNCentJets", "Number of Central Jets; Number of Central Jets; Events;", 40, 0, 40)
+hSecJetPt = TH1D("hSecJetPt", "Second Leading Jet p_{T}; p_{T} {GeV}; Events;", 50, 0, 1000)
+hSecJetEta = TH1D("hSecJetEta", "Second Leading Jet #eta; #eta; Events;", 80, -4.0, 4.0)
 
 lepP4        = TLorentzVector(0.0, 0.0, 0.0, 0.0)
-#jetP4        = TLorentzVector(0.0, 0.0, 0.0, 0.0)
+jetP4        = TLorentzVector(0.0, 0.0, 0.0, 0.0)
 nearestJetP4 = TLorentzVector(0.0, 0.0, 0.0, 0.0)
 
 # Open the input ntuples
@@ -223,14 +229,63 @@ for fname in fnames:
     
     ncut += 1
     hCutflow.Fill(ncut, evtwt)
-    # separate the jets into central and forward jet collections  
+
 
     if len(ele_iso) > 0:
     	hlepIso_sig.Fill(ele_iso[0], evtwt)
     else:
 	hlepIso_sig.Fill(mu_iso[0], evtwt) 
-      
-    del jetsP4[:] 
+
+    # separate the jets into central and forward jet collections    
+    centjets = []
+    fjets = []
+    for j in jetsP4:
+	jet1 = j
+	eta1 = j.Eta()
+	if abs(eta1) < 2.4:
+	    centjets.append(jet1)
+	else:
+	    fjets.append(jet1)
+    
+    # histograms showing number of forward and central jets before jet cuts
+    hNForwardJets.Fill(len(fjets), evtwt)
+    hNCentJets.Fill(len(centjets), evtwt)
+
+    # 1 or more forward jets
+    if len(fjets) < 1: continue
+    ncut += 1
+    hCutflow.Fill(ncut, evtwt)
+    # 3 or more central jets
+    if len(centjets) < 3: continue
+    ncut += 1
+    hCutflow.Fill(ncut, evtwt)
+
+    # leading jet pt > 200
+    leadjet = centjets[0]
+    leadjetpt = leadjet.Pt()
+    leadjeteta = leadjet.Eta()
+    if leadjetpt <= 200: continue
+    ncut += 1
+    hCutflow.Fill(ncut, evtwt)
+
+    # second leading jet pt > 80
+    secondjet = centjets[1]
+    secondjetpt = secondjet.Pt()
+    secondjeteta = secondjet.Eta()
+    if secondjetpt <= 80: continue
+    ncut += 1
+    hCutflow.Fill(ncut, evtwt)
+
+    # other variables and histograms with jets
+    hLeadingJetPt.Fill(leadjetpt, evtwt)
+    hLeadingJetEta.Fill(leadjeteta, evtwt)
+    hSecJetPt.Fill(secondjetpt, evtwt)
+    hSecJetEta.Fill(secondjeteta, evtwt)
+    
+    
+    del jetsP4[:]
+    del fjets[:]
+    del centjets[:]
     #print ievt
 fout.Write()
 fout.Close()
