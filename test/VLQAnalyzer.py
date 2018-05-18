@@ -76,10 +76,16 @@ hDPtRel    = TH1D("hDPtRel", "#Delta p_{T}^{REL}; #Delta p_{T}^{REL} (GeV); Even
 hDelPtRel  = TH1D("hDelPtRel", "#Delta p_{T}^{REL}; #Delta p_{T}^{REL} [GeV]; Events/20 GeV;", 50, 0, 100) 
 h2DdPtReldR = TH2D("h2DdPtReldR", ";#Delta R(l,j); #Delta p_{T}^{REL} [GeV]", 50, 0.0, 1.0, 20, 0., 200.)
 h2DdPtRelDRMin = TH2D("h2DdPtRelDRMin", ";#Delta R_{MIN}(l,j); min #Delta p_{T}^{REL} (GeV)", 50, 0.0, 1.0, 20, 0., 200.)
-h2DPtRelDRMin = TH2D("h2DPtRelDRMin",";#Delta R_{MIN}(l,j); p_{T,rel} (GeV)", 50, 0.0, 1.0, 20, 0., 200.) 
+h2DPtRelDRMin = TH2D("h2DPtRelDRMin", ";#Delta R_{MIN}(l,j); p_{T,rel} (GeV)", 50, 0.0, 1.0, 20, 0., 200.) 
+hNForwardJets = TH1D("hNForwardJets", "Number of Forward Jets; Number of Forward Jets; Events;", 40, 0, 40)
+hLeadingJetPt = TH1D("hLeadingJetPt", "Leading Jet p_{T}; p_{T} {GeV}; Events;", 50, 0, 1000)
+hLeadingJetEta = TH1D("hLeadingJetEta", "Leading Jet #eta; #eta; Events;", 80, -4.0, 4.0)
+hNCentJets = TH1D("hNCentJets", "Number of Central Jets; Number of Central Jets; Events;", 40, 0, 40)
+hSecJetPt = TH1D("hSecJetPt", "Second Leading Jet p_{T}; p_{T} {GeV}; Events;", 50, 0, 1000)
+hSecJetEta = TH1D("hSecJetEta", "Second Leading Jet #eta; #eta; Events;", 80, -4.0, 4.0)
 
 lepP4        = TLorentzVector(0.0, 0.0, 0.0, 0.0)
-#jetP4        = TLorentzVector(0.0, 0.0, 0.0, 0.0)
+jetP4        = TLorentzVector(0.0, 0.0, 0.0, 0.0)
 nearestJetP4 = TLorentzVector(0.0, 0.0, 0.0, 0.0)
 
 # Open the input ntuples
@@ -132,20 +138,43 @@ for fname in fnames:
       eWP = t.Electrons_eleWP[i]    
       if (eWP & 1) != 1: continue
       if ele_pt[i] < 40.: continue 
-      if abs(ele_eta[i]) < 2.8: continue
+      if abs(ele_eta[i]) > 2.8: continue
       nMedium += 1
       #print 'mva = ',  ele_mva[i], 'eta = ', abs(ele_eta[i]), 'pt = ', ele_pt[i], 'eWP = ', eWP 
 
+  # loop on muons, selecting medium WP muons
+    nmuMedium=0
+    mu_eta = t.Muons_eta
+    mu_phi = t.Muons_phi
+    mu_pt  = t.Muons_pt
+    mu_m   = t.Muons_mass
+    mu_iso = t.Muons_relIso
+    #print 'size of muons :' , len(t.Muons_pt)
+    for i in range(0, len(t.Muons_pt)):
+      # choose the WP: 1 = loose, 2 = medium, 4 = tight
+      muWP = t.Muons_muWP[i]
+      if (muWP & 1) != 1: continue
+      if mu_pt[i] < 40.: continue
+      if abs(mu_eta[i]) > 4.0: continue
+      nmuMedium += 1
+      #print 'mva = ',  mu_mva[i], 'eta = ', abs(mu_eta[i]), 'pt = ', mu_pt[i], 'muWP = ', muWP 
+
     #require exactly one lepton   
-    if nMedium != 1: continue 
+    if nMedium + nmuMedium != 1: continue 
     ncut += 1
     hCutflow.Fill(ncut, evtwt)
     
     # store lep variables:
-    hlepPt.Fill(ele_pt[0], evtwt)
-    hlepEta.Fill(ele_eta[0], evtwt)
-    hlepIso.Fill(ele_iso[0], evtwt) 
-    lepP4.SetPtEtaPhiM(ele_pt[0], ele_eta[0], ele_phi[0], ele_m[0])
+    if len(ele_pt) > 0:
+    	hlepPt.Fill(ele_pt[0], evtwt)
+    	hlepEta.Fill(ele_eta[0], evtwt)
+    	hlepIso.Fill(ele_iso[0], evtwt) 
+    	lepP4.SetPtEtaPhiM(ele_pt[0], ele_eta[0], ele_phi[0], ele_m[0])
+    else:
+	hlepPt.Fill(mu_pt[0], evtwt)
+        hlepEta.Fill(mu_eta[0], evtwt)
+        hlepIso.Fill(mu_iso[0], evtwt)
+        lepP4.SetPtEtaPhiM(mu_pt[0], mu_eta[0], mu_phi[0], mu_m[0])
     lep_p3 = lepP4.Vect();
 
     # loop over jets 
@@ -200,11 +229,63 @@ for fname in fnames:
     
     ncut += 1
     hCutflow.Fill(ncut, evtwt)
-    # separate the jets into central and forward jet collections  
+
+
+    if len(ele_iso) > 0:
+    	hlepIso_sig.Fill(ele_iso[0], evtwt)
+    else:
+	hlepIso_sig.Fill(mu_iso[0], evtwt) 
+
+    # separate the jets into central and forward jet collections    
+    centjets = []
+    fjets = []
+    for j in jetsP4:
+	jet1 = j
+	eta1 = j.Eta()
+	if abs(eta1) < 2.4:
+	    centjets.append(jet1)
+	else:
+	    fjets.append(jet1)
     
-    hlepIso_sig.Fill(ele_iso[0], evtwt) 
-      
-    del jetsP4[:] 
+    # histograms showing number of forward and central jets before jet cuts
+    hNForwardJets.Fill(len(fjets), evtwt)
+    hNCentJets.Fill(len(centjets), evtwt)
+
+    # 1 or more forward jets
+    if len(fjets) < 1: continue
+    ncut += 1
+    hCutflow.Fill(ncut, evtwt)
+    # 3 or more central jets
+    if len(centjets) < 3: continue
+    ncut += 1
+    hCutflow.Fill(ncut, evtwt)
+
+    # leading jet pt > 200
+    leadjet = centjets[0]
+    leadjetpt = leadjet.Pt()
+    leadjeteta = leadjet.Eta()
+    if leadjetpt <= 200: continue
+    ncut += 1
+    hCutflow.Fill(ncut, evtwt)
+
+    # second leading jet pt > 80
+    secondjet = centjets[1]
+    secondjetpt = secondjet.Pt()
+    secondjeteta = secondjet.Eta()
+    if secondjetpt <= 80: continue
+    ncut += 1
+    hCutflow.Fill(ncut, evtwt)
+
+    # other variables and histograms with jets
+    hLeadingJetPt.Fill(leadjetpt, evtwt)
+    hLeadingJetEta.Fill(leadjeteta, evtwt)
+    hSecJetPt.Fill(secondjetpt, evtwt)
+    hSecJetEta.Fill(secondjeteta, evtwt)
+    
+    
+    del jetsP4[:]
+    del fjets[:]
+    del centjets[:]
     #print ievt
 fout.Write()
 fout.Close()

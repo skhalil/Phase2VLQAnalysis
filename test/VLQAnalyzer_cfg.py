@@ -40,7 +40,7 @@ process.source = cms.Source("PoolSource",
         ),
                             secondaryFileNames = cms.untracked.vstring(
        #'/store/mc/PhaseIITDRFall17DR/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8/GEN-SIM-RECO/PU200_93X_upgrade2023_realistic_v2-v1/30000/F24662E9-C2B0-E711-B263-0242AC130002.root',
-       'file:AEE9EBD2-A1B9-E711-B422-0CC47A1E046E.root',
+       'file://AEE9EBD2-A1B9-E711-B422-0CC47A1E046E.root',
         #'/store/mc/PhaseIITDRFall17DR/TprimeBToTH_M-1000_Width-10p_LH_TuneCUETP8M2T4_14TeV-madgraph-pythia8/GEN-SIM-RECO/PU200_93X_upgrade2023_realistic_v2-v1/150000/6430FCA9-91B8-E711-B58E-24BE05CE6D61.root',
         #'/store/mc/PhaseIITDRFall17DR/TprimeBToTH_M-1000_Width-10p_LH_TuneCUETP8M2T4_14TeV-madgraph-pythia8/GEN-SIM-RECO/PU200_93X_upgrade2023_realistic_v2-v1/150000/8C648B49-42B9-E711-9F52-24BE05CE3EA1.root',
         #'/store/mc/PhaseIITDRFall17DR/TprimeBToTH_M-1000_Width-10p_LH_TuneCUETP8M2T4_14TeV-madgraph-pythia8/GEN-SIM-RECO/PU200_93X_upgrade2023_realistic_v2-v1/150000/9A17A2BA-86B8-E711-8F16-24BE05C618F1.root',
