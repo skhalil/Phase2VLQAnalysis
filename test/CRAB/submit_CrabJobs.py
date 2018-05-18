@@ -7,8 +7,8 @@ from multiprocessing import Process
 
 PPNdir = os.environ['CMSSW_BASE']+'/src/Upgrades/VLQAnalyzer/'
 
-batch = "signal"
-#batch = "background"
+#batch = "signal"
+batch = "background"
 
 if "signal" in batch:
 	mydatasets = 'ana_crab_input_files_signal.txt'
@@ -41,13 +41,15 @@ config.Data.secondaryInputDataset = None
 config.Data.inputDBS = 'global'
 config.Data.splitting = filesplit
 config.Data.unitsPerJob = units
-config.Data.outLFNDirBase = '/store/group/lpcbprime/noreplica/skhalil/Upgrade'
+#config.Data.outLFNDirBase = '/store/group/lpcbprime/noreplica/skhalil/Upgrade'
+config.Data.outLFNDirBase = '/store/user/skhalil/upgradeNtuples/'
+#physical location:  /mnt/hadoop/user/uscms01/pnfs/unl.edu/data4/cms/store/group/skhalil/upgradeNtuples/
 config.Data.allowNonValidInputDataset = True
 #config.Data.ignoreLocality = False
 config.Data.publication = False
 
 config.section_('Site')
-config.Site.storageSite = 'T3_US_FNALLPC'
+config.Site.storageSite = 'T2_US_Nebraska' #'T3_US_FNALLPC'
 
 def submit(config):
     try:
@@ -65,11 +67,12 @@ for ijob in jobsLines :
     print 's: ', s
     cdi = s + 'MINIAODSIM'
     cgr = s.split('/')[1]
+    #print 'cgr: ', cgr  
     if 'ext1' in s: cgr_v1 = cgr+'_ext1' 
     else: cgr_v1 = cgr 
     r = s.replace("MiniAOD","DR" )
     cds = r + 'GEN-SIM-RECO'
-    if 'TT' in cgr and 'v3' in cgr:
+    if 'TT' in cgr:
             cds_v1 = cds.replace("v3", "v1")
     else:   cds_v1 = cds
     config.Data.inputDataset = cdi
