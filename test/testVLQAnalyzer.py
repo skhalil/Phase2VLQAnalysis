@@ -264,9 +264,9 @@ maxEvts = options.maxEvts
 
 # Define the output histograms
 fname = options.files.rstrip()
-ftemp = fname.split("//")[2]
-fout = TFile(ftemp.split("/")[5].replace('.root', '_out.root'), 'RECREATE')
-print 'here is something: ', ftemp.split("/")[5].replace('.root', '_out.root')
+ftemp = fname.split("/")[14]
+fout = TFile(ftemp.replace('.root', '_out.root'), 'RECREATE')
+print 'here is something: ', ftemp.replace('.root', '_out.root')
 fout.cd()
 
 hCutflow = TH1D("hCutflow" ,";;Events;" ,10, 0.5, 10.5)
@@ -443,7 +443,7 @@ for t in tree:
     ncut = 0
     if maxEvts > 0 and ievt > maxEvts: break
     if ievt%100 == 0: print " Processing evt %i" % ievt
-    
+
     ievt += 1
     #ncut += 1
     # call the Gen weights

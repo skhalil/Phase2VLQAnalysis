@@ -15,4 +15,9 @@ git clone git@github.com:skhail/VLQAnalyzer.git Upgrades/VLQAnalyzer
 scram b -j4
 ```
 To run:
+cd test
+python testVLQAnalyzer.py -f "NAME-OF-ROOT-FILE-YOU-WOULD-LIKE-TO-RUN-OVER.root"
 
+
+
+Note: To run over individual ntuple files, you must use the testVLQAnalyzer.py file and not the VLQAnalyzer.py file, because the VLQAnalyzer.py file is set up to be used in CRAB jobs.
